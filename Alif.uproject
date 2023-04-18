@@ -1,0 +1,22 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "2E700732-EDCB-4308-84CF-68F6BA043588",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "Alif",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": false,
+			"TargetAllowList": [
+				"Editor"
+			]
+		}
+	]
+}
