@@ -105,6 +105,8 @@ private:
 	float CameraScrollSpeed = 4000.f;
 	/**The standard angle to look down on the map*/
 	FRotator StandardCameraLookDownAngle = FRotator(-45.f,45.f,0.f);
+	/**The standard camera field of view*/
+	float StandardFOV = 30.f;
 	/**size of the area at teh edge of the screen that will trigget camera scrolling*/
 	const uint32 CameraActiveBorder = 20;
 

@@ -23,9 +23,8 @@ void UMainCameraComponent::GetCameraView(float DeltaTime, FMinimalViewInfo& Desi
 
     if(PlayerController)
     {
-        DesiredView.FOV = 30.f; //why is this FOV hardcoded ?
+        DesiredView.FOV = StandardFOV; 
         const float CurrentOffset = MinCameraOffset + ZoomAlpha * (MaxCameraOffset - MinCameraOffset);
-        FVector Pos2 = PlayerController->GetFocalLocation();
         DesiredView.Location = PlayerController->GetFocalLocation() - StandardCameraLookDownAngle.Vector() * CurrentOffset;
         DesiredView.Rotation = StandardCameraLookDownAngle;
 
