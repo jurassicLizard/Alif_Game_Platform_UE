@@ -33,25 +33,27 @@ private:
 
 	UPROPERTY()
 	class UStdInputMappingContext* StandardPlayMappingContext;
+	UPROPERTY()
 	class ULookAction* LookAction;
+	UPROPERTY()
+	class UZoomAction* ZoomAction;
+
+	/** Handles the mouse scrolling up*/
+	void OnMouseScrollUp();
+	/** Handles the mouse scrolling down*/
+	void OnMouseScrollDown();
 
 
 
 protected:
 
-	void Move2D(const FInputActionValue& Value);
+	void TriggerMove2D(const FInputActionValue& Value);
+	void TriggerZoom(const FInputActionValue& Value);
 
 
-//public access 
+
+//public access Section
 public:
-
-	/** Handles the mouse scrolling up*/
-	void OnMouseScrollUp();
-
-	/** Handles the mouse scrolling down*/
-	void OnMouseScrollDown();
-
-
 	/** Returns a pointer to the camera component the pawn has*/
 	UMainCameraComponent* GetMainCameraComponent();
 

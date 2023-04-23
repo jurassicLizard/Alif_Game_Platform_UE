@@ -3,6 +3,8 @@
 
 #include "EnhancedInput/StdInputMappingContext.h"
 #include "EnhancedInput/LookAction.h"
+#include "EnhancedInput/ZoomAction.h"
+
 
 
 #include "InputCoreTypes.h" 
@@ -10,6 +12,8 @@
 UStdInputMappingContext::UStdInputMappingContext() 
 {
     const ULookAction* const LookAction = GetDefault<ULookAction>(); 
+    const UZoomAction* const ZoomAction = GetDefault<UZoomAction>(); 
+
     /**Or maybe use StaticClass() like ULookAction::StaticClass() 
      * 
      * ADDENDUM : NO you cannot use StaticClass() because it returns a UClass which is the type 
@@ -22,13 +26,12 @@ UStdInputMappingContext::UStdInputMappingContext()
         MapKey(LookAction,FKey(EKeys::Mouse2D));
     }
 
-
-}
-
-void UStdInputMappingContext::AddInputActionToContext(UInputAction *InputAction)
-{
-    //Th is 
+    if(ZoomAction)
+    {
+        MapKey(ZoomAction,FKey(EKeys::MouseWheelAxis));
+    }
 
 
 }
+
 

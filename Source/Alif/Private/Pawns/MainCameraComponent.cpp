@@ -269,12 +269,14 @@ void UMainCameraComponent::Move2D(FVector2D MoveOffset)
         if(PlayerController && PlayerController->PlayerCameraManager)
         {
             const FRotationMatrix R(PlayerController->PlayerCameraManager->GetCameraRotation());
-            const FVector WorldSpaceAccelRight = R.GetScaledAxis( EAxis::Y ) * 100.f;
-            const FVector WorldSpaceAccelForward = R.GetScaledAxis( EAxis::X ) * 100.f;
+            const FVector WorldSpaceAccelRight = R.GetScaledAxis( EAxis::Y ) ;
+            const FVector WorldSpaceAccelForward = R.GetScaledAxis( EAxis::X ) ;
+            UE_LOG(LogTemp, Warning, TEXT("ROtationmatrix Scaled Axis Y for Camera Rotation : X: %f, Y: %f, Z: %f"),WorldSpaceAccelRight.X,WorldSpaceAccelRight.Y,WorldSpaceAccelRight.Z);
+            UE_LOG(LogTemp, Warning, TEXT("ROtationmatrix Scaled Axis X for Camera Rotation : X: %f, Y: %f, Z: %f"),WorldSpaceAccelForward.X,WorldSpaceAccelForward.Y,WorldSpaceAccelForward.Z);
+            //TODO add deltatime handling and mouse speed
+            OwnerPawn->AddMovementInput(FVector(FVector2D(WorldSpaceAccelRight),0.f), MoveOffset.X);
+            OwnerPawn->AddMovementInput(FVector(FVector2D(WorldSpaceAccelForward),0.f), MoveOffset.Y);
 
-
-            OwnerPawn->AddMovementInput(WorldSpaceAccelRight, MoveOffset.Y);
-            OwnerPawn->AddMovementInput(WorldSpaceAccelForward, MoveOffset.X);
 
         }
     }

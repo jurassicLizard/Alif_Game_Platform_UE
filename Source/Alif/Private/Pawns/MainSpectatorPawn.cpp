@@ -11,6 +11,8 @@
 #include "Pawns/MainCameraComponent.h" 	
 #include "EnhancedInput/StdInputMappingContext.h"
 #include "EnhancedInput/LookAction.h"
+#include "EnhancedInput/ZoomAction.h"
+
 
 
 
@@ -23,7 +25,8 @@
 AMainSpectatorPawn::AMainSpectatorPawn(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer.SetDefaultSubobjectClass<UMainSpectatorPawnMovement>(Super::MovementComponentName)), 
     StandardPlayMappingContext(GetMutableDefault<UStdInputMappingContext>()), //TODO change this to be called from StdInputMappingContext on Demand
-    LookAction(GetMutableDefault<ULookAction>())
+    LookAction(GetMutableDefault<ULookAction>()),
+    ZoomAction(GetMutableDefault<UZoomAction>())
 {
     PrimaryActorTick.bCanEverTick = false;
 
@@ -64,11 +67,16 @@ void AMainSpectatorPawn::SetupPlayerInputComponent(UInputComponent *InputCompone
 
     //Setup Enhanced Input System Action bindings
 
+    if(LookAction == nullptr ||
+        ZoomAction == nullptr)
+    {
+        UE_LOG(LogTemp, Error, TEXT("We Cannot Move / Only Partially move. this is fatal"));
+    }
+
     if(UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
     {
-        EnhancedInputComponent->BindAction(LookAction,ETriggerEvent::Triggered,this,&AMainSpectatorPawn::Move2D);
-
-         UE_LOG(LogTemp, Warning, TEXT("Was able to bind Look Action"));
+        EnhancedInputComponent->BindAction(LookAction,ETriggerEvent::Triggered,this,&AMainSpectatorPawn::TriggerMove2D);
+        EnhancedInputComponent->BindAction(ZoomAction,ETriggerEvent::Triggered,this,&AMainSpectatorPawn::TriggerZoom);
         
     }
 
@@ -76,19 +84,44 @@ void AMainSpectatorPawn::SetupPlayerInputComponent(UInputComponent *InputCompone
 
 }
 
-void AMainSpectatorPawn::Move2D(const FInputActionValue& Value)
+void AMainSpectatorPawn::TriggerMove2D(const FInputActionValue& Value)
 {
     FVector2D MouseXY = Value.Get<FVector2D>();
-    UE_LOG(LogTemp, Warning, TEXT("Triggering move2d function %X : %f, Y: %f"),MouseXY.X,MouseXY.Y);
+        
+    if (MainCameraComponent)
+    {
+        MainCameraComponent->Move2D(MouseXY);
+    }
+
 }
-void AMainSpectatorPawn::OnMouseScrollUp()
+
+void AMainSpectatorPawn::TriggerZoom(const FInputActionValue& Value)
 {
+    float MouseWheelVal = Value.Get<float>();
+
+    if(MainCameraComponent)
+    {
+         (MouseWheelVal > 0) ? MainCameraComponent->TriggerZoomIn() : MainCameraComponent->TriggerZoomOut();
+    }
+
+
+}
+
+void AMainSpectatorPawn::OnMouseScrollUp()
+{  
+    if(MainCameraComponent)
+    {
+        MainCameraComponent->TriggerZoomIn();
+    }
     
 }
 
 void AMainSpectatorPawn::OnMouseScrollDown()
 {
-    //TODO Add OnZoomIn Functionality from Camera Component
+    if(MainCameraComponent)
+    {
+        MainCameraComponent->TriggerZoomOut();
+    }
 }
 
 UMainCameraComponent *AMainSpectatorPawn::GetMainCameraComponent()

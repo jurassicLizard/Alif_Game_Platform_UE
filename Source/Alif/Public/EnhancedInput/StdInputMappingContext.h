@@ -21,10 +21,6 @@ public:
 //End Class Interface
 
 
-protected:
-
-   void AddInputActionToContext(UInputAction* InputAction);
-
 
 
 	
