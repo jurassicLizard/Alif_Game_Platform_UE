@@ -12,6 +12,8 @@
 #include "EnhancedInput/StdInputMappingContext.h"
 #include "EnhancedInput/LookAction.h"
 #include "EnhancedInput/ZoomAction.h"
+#include "EnhancedInput/SelectAction.h"
+#include "EnhancedInput/ReleaseAction.h"
 
 
 
@@ -24,9 +26,7 @@
 
 AMainSpectatorPawn::AMainSpectatorPawn(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer.SetDefaultSubobjectClass<UMainSpectatorPawnMovement>(Super::MovementComponentName)), 
-    StandardPlayMappingContext(GetMutableDefault<UStdInputMappingContext>()), //TODO change this to be called from StdInputMappingContext on Demand
-    LookAction(GetMutableDefault<ULookAction>()),
-    ZoomAction(GetMutableDefault<UZoomAction>())
+    StandardPlayMappingContext(GetMutableDefault<UStdInputMappingContext>()) //TODO change this to be called from StdInputMappingContext on Demand
 {
     PrimaryActorTick.bCanEverTick = false;
 
@@ -35,6 +35,16 @@ AMainSpectatorPawn::AMainSpectatorPawn(const FObjectInitializer& ObjectInitializ
     bAddDefaultMovementBindings = false;
     MainCameraComponent = CreateDefaultSubobject<UMainCameraComponent>(TEXT("MainCameraComponent"));
     MainCameraComponent->SetupAttachment(GetRootComponent());
+
+
+    if(StandardPlayMappingContext)
+    {
+        LookAction    = StandardPlayMappingContext->GetLookAction();
+        ZoomAction    = StandardPlayMappingContext->GetZoomAction();
+        SelectAction  = StandardPlayMappingContext->GetSelectAction();
+        ReleaseAction = StandardPlayMappingContext->GetReleaseAction();
+    }
+
 }
 
 //Superclass override

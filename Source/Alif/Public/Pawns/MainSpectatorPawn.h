@@ -37,6 +37,9 @@ private:
 	class ULookAction* LookAction;
 	UPROPERTY()
 	class UZoomAction* ZoomAction;
+	UPROPERTY()
+	class USelectAction* SelectAction;
+	class UReleaseAction* ReleaseAction;
 
 	/** Handles the mouse scrolling up*/
 	void OnMouseScrollUp();

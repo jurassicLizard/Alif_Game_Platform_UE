@@ -4,15 +4,22 @@
 #include "EnhancedInput/StdInputMappingContext.h"
 #include "EnhancedInput/LookAction.h"
 #include "EnhancedInput/ZoomAction.h"
+#include "EnhancedInput/SelectAction.h"
+#include "EnhancedInput/ReleaseAction.h"
+
+
 
 
 
 #include "InputCoreTypes.h" 
+#include "EnhancedActionKeyMapping.h"
 
-UStdInputMappingContext::UStdInputMappingContext() 
+UStdInputMappingContext::UStdInputMappingContext()
 {
-    const ULookAction* const LookAction = GetDefault<ULookAction>(); 
-    const UZoomAction* const ZoomAction = GetDefault<UZoomAction>(); 
+    LookAction = GetDefault<ULookAction>();
+    ZoomAction = GetDefault<UZoomAction>();
+    SelectAction = GetDefault<USelectAction>();
+    ReleaseAction = GetDefault<UReleaseAction>();
 
     /**Or maybe use StaticClass() like ULookAction::StaticClass() 
      * 
@@ -31,7 +38,17 @@ UStdInputMappingContext::UStdInputMappingContext()
         MapKey(ZoomAction,FKey(EKeys::MouseWheelAxis));
     }
 
+    if(SelectAction)
+    {
+        MapKey(SelectAction,FKey(EKeys::LeftMouseButton));
+    }
+
+    if(ReleaseAction)
+    {
+        MapKey(ReleaseAction,FKey(EKeys::RightMouseButton));
+    }
 
 }
+
 
 
