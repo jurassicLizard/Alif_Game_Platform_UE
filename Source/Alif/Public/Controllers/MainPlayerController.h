@@ -19,14 +19,16 @@ public:
 	AMainPlayerController();
 	/**End Class Interface*/
 
+//begin AController interface
+	/** update input detection */
+	virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused) override;
+//end AController interface
+
+
 private:
 
+UPROPERTY()
 TWeakObjectPtr<AActor> CurSelectedActor;
-
-
-
-
-
 
 
 
@@ -35,10 +37,14 @@ TWeakObjectPtr<AActor> CurSelectedActor;
 public:
 
 /**Setters and getters*/
+UFUNCTION()
 TWeakObjectPtr<AActor> GetCurSelectedActor() const {return CurSelectedActor;};
-void SetCurSelectedActor(AActor* NewActor){ CurSelectedActor = NewActor};
+
+void SetCurSelectedActor(AActor* const NewActor){ CurSelectedActor = NewActor;};
 void ClearActorSelection(){CurSelectedActor = nullptr;};
 /**End Setters and getters*/
+
+
 
 
 

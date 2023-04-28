@@ -3,6 +3,8 @@
 
 #include "Game/AlifGameModeBase.h"
 #include "Pawns/MainSpectatorPawn.h"
+#include "Controllers/MainPlayerController.h"
+
 
 AAlifGameModeBase::AAlifGameModeBase()
 {
@@ -12,6 +14,7 @@ AAlifGameModeBase::AAlifGameModeBase()
 
     SpectatorClass = AMainSpectatorPawn::StaticClass();
     DefaultPawnClass = AMainSpectatorPawn::StaticClass();
+    PlayerControllerClass = AMainPlayerController::StaticClass();
 
 
     

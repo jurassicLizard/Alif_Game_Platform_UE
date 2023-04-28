@@ -77,7 +77,7 @@ void UMainCameraComponent::UpdateCameraBounds(const APlayerController *InPlayerC
 
     if(CameraMovementBounds.GetSize() == FVector::ZeroVector || CurrentViewportSize != CameraMovementViewportSize)
     {
-        //calc frustom edge direction , from bottom left corner (Left Hand DirectX with y axis pointing to your left and z to your face or upwards :D )
+        //calc frustum edge direction , from bottom left corner (Left Hand DirectX with y axis pointing to your left and z to your face or upwards :D )
         const FVector FrustumRay2DDir = FVector(1,1,0).GetSafeNormal();
         const FVector FrustumRay2DRight = FVector::CrossProduct(FrustumRay2DDir, FVector::UpVector); // right hand rule rules
         const FQuat RotQuat(FrustumRay2DRight, FMath::DegreesToRadians(90.f - InPlayerController->PlayerCameraManager->GetFOVAngle()*0.5));
@@ -191,47 +191,46 @@ void UMainCameraComponent::UpdateCameraMovement( const APlayerController* InPlay
 
        bool bNoScrollZone = AreCoordsInNoScrollZone(MousePosition);
 
-       ASpectatorPawn* SpectatorPawn = InPlayerController->GetSpectatorPawn();
+       ASpectatorPawn* SpectatorPawn = Cast<ASpectatorPawn>(InPlayerController->GetPawnOrSpectator());
 
-       if(SpectatorPawn->GetMovementComponent() != nullptr)
+       if(SpectatorPawn && SpectatorPawn->GetMovementComponent())
        {
         //get the current maxspeed from the movement component
             const UMainSpectatorPawnMovement* const DefaultSpectatorPawnMovement = GetDefault<UMainSpectatorPawnMovement>(SpectatorPawn->GetMovementComponent()->GetClass());
             if(DefaultSpectatorPawnMovement)
             {
                 SpectatorCameraSpeed = DefaultSpectatorPawnMovement->MaxSpeed;
-
             }
        }
 
        if (!bNoScrollZone)
        {
             FVector2D CameraOffset = FVector2D::ZeroVector; //X is our Forward Axis and Y is our Right left Axis
-            //Border stoppage conditions horizontal
+            //Border moving conditions horizontal
             if (MouseX >= ViewLeft && MouseX <= (ViewLeft + CameraActiveBorder))
             {
                 const float delta = 1.0f - float(MouseX - ViewLeft) / CameraActiveBorder;
                 SpectatorCameraSpeed = delta * MaxAllowedScrollSpeed;
-                CameraOffset.Y = -MouseBorderScrollSpeed * delta; //move right
+                CameraOffset.X = -MouseBorderScrollSpeed * delta; //move right
 
             }else if (MouseX >= (ViewRight - CameraActiveBorder) && MouseX <= ViewRight)
             {
                 const float delta = float(MouseX - (ViewRight - CameraActiveBorder)) / CameraActiveBorder;
                 SpectatorCameraSpeed = delta * MaxAllowedScrollSpeed;
-                CameraOffset.Y =  MouseBorderScrollSpeed * delta; // move right
+                CameraOffset.X =  MouseBorderScrollSpeed * delta; // move right
             }
 
-            //Border stoppage conditions vertical
+            //Border moving conditions vertical
             if(MouseY >= ViewTop && MouseY <= (ViewTop + CameraActiveBorder))
             {
                 const float delta = 1.0f - float(MouseY - ViewTop) / CameraActiveBorder;
                 SpectatorCameraSpeed = delta * MaxAllowedScrollSpeed;
-                CameraOffset.X = MouseBorderScrollSpeed * delta; //move forward
+                CameraOffset.Y = MouseBorderScrollSpeed * delta; //move forward
             }else if (MouseY >= (ViewBottom - CameraActiveBorder) && MouseY <= ViewBottom)
             {
                 const float delta = float(MouseY - (ViewBottom - CameraActiveBorder)) / CameraActiveBorder;
                 SpectatorCameraSpeed = MouseBorderScrollSpeed * delta;
-                CameraOffset.X = -MouseBorderScrollSpeed * delta; // move forward
+                CameraOffset.Y = -MouseBorderScrollSpeed * delta; // move forward
 
             }
 
@@ -245,6 +244,7 @@ void UMainCameraComponent::UpdateCameraMovement( const APlayerController* InPlay
                 if(DefaultSpectatorPawnMovement)
                 {
                    DefaultSpectatorPawnMovement->MaxSpeed = SpectatorCameraSpeed;
+                   UE_LOG(LogTemp, Warning, TEXT("We are THere in the Player Camera speed thingy !"));
 
                 }
             }           
@@ -271,8 +271,6 @@ void UMainCameraComponent::Move2D(FVector2D MoveOffset)
             const FRotationMatrix R(PlayerController->PlayerCameraManager->GetCameraRotation());
             const FVector WorldSpaceAccelRight = R.GetScaledAxis( EAxis::Y ) ;
             const FVector WorldSpaceAccelForward = R.GetScaledAxis( EAxis::X ) ;
-            UE_LOG(LogTemp, Warning, TEXT("ROtationmatrix Scaled Axis Y for Camera Rotation : X: %f, Y: %f, Z: %f"),WorldSpaceAccelRight.X,WorldSpaceAccelRight.Y,WorldSpaceAccelRight.Z);
-            UE_LOG(LogTemp, Warning, TEXT("ROtationmatrix Scaled Axis X for Camera Rotation : X: %f, Y: %f, Z: %f"),WorldSpaceAccelForward.X,WorldSpaceAccelForward.Y,WorldSpaceAccelForward.Z);
             //TODO add deltatime handling and mouse speed
             OwnerPawn->AddMovementInput(FVector(FVector2D(WorldSpaceAccelRight),0.f), MoveOffset.X);
             OwnerPawn->AddMovementInput(FVector(FVector2D(WorldSpaceAccelForward),0.f), MoveOffset.Y);

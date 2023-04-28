@@ -26,6 +26,6 @@ public:
 	
 	
 private:
-	bool bInitialLocationSet;
+	bool bInitialLocationSet = false;
 	
 };

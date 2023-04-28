@@ -83,10 +83,21 @@ void AMainSpectatorPawn::SetupPlayerInputComponent(UInputComponent *InputCompone
         UE_LOG(LogTemp, Error, TEXT("We Cannot Move / Only Partially move. this is fatal"));
     }
 
+    
+    if(SelectAction == nullptr ||
+        ReleaseAction == nullptr)
+    {
+        UE_LOG(LogTemp, Error, TEXT("We Cannot use any selection or release options. this is fatal"));
+    }
+
+ 
+
     if(UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
     {
         EnhancedInputComponent->BindAction(LookAction,ETriggerEvent::Triggered,this,&AMainSpectatorPawn::TriggerMove2D);
         EnhancedInputComponent->BindAction(ZoomAction,ETriggerEvent::Triggered,this,&AMainSpectatorPawn::TriggerZoom);
+        EnhancedInputComponent->BindAction(SelectAction,ETriggerEvent::Triggered,this,&AMainSpectatorPawn::OnMouseLeft);
+        EnhancedInputComponent->BindAction(ReleaseAction,ETriggerEvent::Triggered,this,&AMainSpectatorPawn::OnMouseRight);
         
     }
 
@@ -116,6 +127,18 @@ void AMainSpectatorPawn::TriggerZoom(const FInputActionValue& Value)
 
 
 }
+
+void AMainSpectatorPawn::OnMouseLeft(const FInputActionValue& Value)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Mouse Left Triggered"));
+}
+
+void AMainSpectatorPawn::OnMouseRight(const FInputActionValue& Value)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Mouse Right Triggered"));
+}
+
+
 
 void AMainSpectatorPawn::OnMouseScrollUp()
 {  

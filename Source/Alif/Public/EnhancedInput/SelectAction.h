@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "InputAction.h"
+#include "InputTriggers.h"
 #include "SelectAction.generated.h"
 
 /**
@@ -18,5 +19,13 @@ class ALIF_API USelectAction : public UInputAction
 public:
 
 	USelectAction();
+
+private:
+
+	UPROPERTY()
+	TObjectPtr<UInputTrigger> PressedTrigger;
+
+
+
 	
 };

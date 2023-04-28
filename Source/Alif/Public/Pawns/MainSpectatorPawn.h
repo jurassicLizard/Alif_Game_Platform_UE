@@ -39,6 +39,7 @@ private:
 	class UZoomAction* ZoomAction;
 	UPROPERTY()
 	class USelectAction* SelectAction;
+	UPROPERTY()
 	class UReleaseAction* ReleaseAction;
 
 	/** Handles the mouse scrolling up*/
@@ -49,15 +50,19 @@ private:
 
 
 protected:
-
+	//Mouse movement Functions
 	void TriggerMove2D(const FInputActionValue& Value);
 	void TriggerZoom(const FInputActionValue& Value);
+	//Mouse selection FUnctions
+	void OnMouseLeft(const FInputActionValue& Value);
+	void OnMouseRight(const FInputActionValue& Value);
 
 
 
 //public access Section
 public:
 	/** Returns a pointer to the camera component the pawn has*/
+	UFUNCTION()
 	UMainCameraComponent* GetMainCameraComponent();
 
 

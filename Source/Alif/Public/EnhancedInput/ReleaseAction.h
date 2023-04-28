@@ -18,5 +18,10 @@ class ALIF_API UReleaseAction : public UInputAction
 public:
 
 	UReleaseAction();
+
+private:
+
+	UPROPERTY()
+	TObjectPtr<UInputTrigger> PressedTrigger;
 	
 };
