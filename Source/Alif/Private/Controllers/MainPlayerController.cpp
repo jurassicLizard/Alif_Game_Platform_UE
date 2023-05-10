@@ -34,7 +34,7 @@ void AMainPlayerController::PostProcessInput(const float DeltaTime, const bool b
 
                     if(bIsGameStateValid)
                     {
-                        UE_LOG(LogTemp, Warning, TEXT("We are THere in the Player Controller !"));
+                        // UE_LOG(LogTemp, Warning, TEXT("We are THere in the Player Controller !"));
                         SpectatorPawn->GetMainCameraComponent()->UpdateCameraMovement(this);
 
                     }

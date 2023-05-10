@@ -5,6 +5,7 @@
 #include "Pawns/MainSpectatorPawn.h"
 #include "Pawns/MainSpectatorPawnMovement.h"
 #include "AlifHelpers.h"
+#include "DrawDebugHelpers.h"
 
 
 
@@ -229,11 +230,11 @@ void UMainCameraComponent::UpdateCameraMovement( const APlayerController* InPlay
             }else if (MouseY >= (ViewBottom - CameraActiveBorder) && MouseY <= ViewBottom)
             {
                 const float delta = float(MouseY - (ViewBottom - CameraActiveBorder)) / CameraActiveBorder;
-                SpectatorCameraSpeed = MouseBorderScrollSpeed * delta;
+                SpectatorCameraSpeed = MaxAllowedScrollSpeed * delta;
                 CameraOffset.Y = -MouseBorderScrollSpeed * delta; // move forward
-
+                UE_LOG(LogTemp, Warning, TEXT("We are inside the bottom border zome"));
             }
-
+            // UE_LOG(LogTemp, Warning, TEXT("CameraOffset.X : %f, CameraOffset.Y : %f"), CameraOffset.X, CameraOffset.Y);
             Move2D(CameraOffset);
 
 
@@ -258,6 +259,42 @@ void UMainCameraComponent::UpdateCameraMovement( const APlayerController* InPlay
 
 }
 
+void UMainCameraComponent::MoveForward(float val)
+{
+    APawn* OwnerPawn = GetOwnerPawn();
+	if( OwnerPawn != NULL )
+	{
+		APlayerController* Controller = GetPlayerController();
+		if( (val != 0.f) && ( Controller != NULL ))
+		{
+			const FRotationMatrix R(Controller->PlayerCameraManager->GetCameraRotation());
+			const FVector WorldSpaceAccel = R.GetScaledAxis( EAxis::X ) * 100.0f;
+
+			// transform to world space and add it
+			OwnerPawn->AddMovementInput(WorldSpaceAccel, val);
+		}
+	}
+
+}
+
+void UMainCameraComponent::MoveRight(float val)
+{
+    APawn* OwnerPawn = GetOwnerPawn();
+	if( OwnerPawn != NULL )
+	{
+		APlayerController* Controller = GetPlayerController();
+		if( (val != 0.f) && ( Controller != NULL ))
+		{
+			const FRotationMatrix R(Controller->PlayerCameraManager->GetCameraRotation());
+			const FVector WorldSpaceAccel = R.GetScaledAxis( EAxis::Y ) * 100.0f;
+
+			// transform to world space and add it
+			OwnerPawn->AddMovementInput(WorldSpaceAccel, val);
+		}	
+	}
+    
+}
+
 void UMainCameraComponent::Move2D(FVector2D MoveOffset)
 {
     APawn* OwnerPawn = GetOwnerPawn();
@@ -270,10 +307,27 @@ void UMainCameraComponent::Move2D(FVector2D MoveOffset)
         {
             const FRotationMatrix R(PlayerController->PlayerCameraManager->GetCameraRotation());
             const FVector WorldSpaceAccelRight = R.GetScaledAxis( EAxis::Y ) ;
-            const FVector WorldSpaceAccelForward = R.GetScaledAxis( EAxis::X ) ;
-            //TODO add deltatime handling and mouse speed
-            OwnerPawn->AddMovementInput(FVector(FVector2D(WorldSpaceAccelRight),0.f), MoveOffset.X);
-            OwnerPawn->AddMovementInput(FVector(FVector2D(WorldSpaceAccelForward),0.f), MoveOffset.Y);
+            const FVector WorldSpaceAccelForward = R.GetScaledAxis( EAxis::X );
+
+            //TODO add deltatime handling and mouse speed by multiplying MoveOffset.X and MoveOffset.Y by an acceleration value * deltatime
+            GEngine->AddOnScreenDebugMessage(1,GetWorld()->GetDeltaSeconds(), FColor::Cyan, FString::Printf(TEXT("WorldSpaceAccelForward.X : %f, WorldSpaceAccelForward.Y :%f, Scale:%f"),WorldSpaceAccelForward.X,WorldSpaceAccelForward.Y,MoveOffset.Y));
+            GEngine->AddOnScreenDebugMessage(2,GetWorld()->GetDeltaSeconds(), FColor::Cyan, FString::Printf(TEXT("WorldSpaceAccelRight.X : %f, WorldSpaceAccelRight.Y :%f, Scale:%f"),WorldSpaceAccelRight.X,WorldSpaceAccelRight.Y,MoveOffset.X));
+
+            if(MoveOffset.X != 0)
+            {
+                OwnerPawn->AddMovementInput(FVector(FVector2D(WorldSpaceAccelRight),0.f), MoveOffset.X );
+            }
+
+            if(MoveOffset.Y != 0)
+            {
+                OwnerPawn->AddMovementInput(FVector(FVector2D(WorldSpaceAccelForward),0.f),MoveOffset.Y );
+            }
+
+
+
+            // DrawDebugLine(GetWorld(),PlayerController->PlayerCameraManager->GetCameraLocation(),WorldSpaceAccelForward*MoveOffset.Y,FColor::Red,true);
+            // DrawDebugLine(GetWorld(),PlayerController->PlayerCameraManager->GetCameraLocation(),WorldSpaceAccelRight*MoveOffset.X,FColor::Black,true);
+
 
 
         }

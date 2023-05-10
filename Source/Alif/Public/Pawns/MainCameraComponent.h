@@ -41,6 +41,9 @@ public:
 
 	/**Handle Camera movements*/
 	void Move2D(FVector2D MoveOffset);
+	void MoveForward(float val);
+	void MoveRight(float val);
+
 
 
 	/**Clamp the Camera Location.

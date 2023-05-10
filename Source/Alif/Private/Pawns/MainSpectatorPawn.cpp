@@ -111,7 +111,15 @@ void AMainSpectatorPawn::TriggerMove2D(const FInputActionValue& Value)
         
     if (MainCameraComponent)
     {
-        MainCameraComponent->Move2D(MouseXY);
+        if(APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+        {
+            if (!PlayerController->bShowMouseCursor)
+            {
+                MainCameraComponent->Move2D(MouseXY);
+
+            }
+
+        }
     }
 
 }
