@@ -9,6 +9,17 @@
 /**
  * 
  */
+UENUM()
+enum class EMPCActionTypes : uint8
+{
+	PRIMARY = 0,
+	SECONDARY,
+	TERTIARY,
+	MAX
+
+
+};
+
 UCLASS()
 class ALIF_API AMainPlayerController : public APlayerController
 {
@@ -24,25 +35,40 @@ public:
 	virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused) override;
 //end AController interface
 
+protected:
+
+	void Tick(float DeltaTime) override;
 
 private:
 
-UPROPERTY()
-TWeakObjectPtr<AActor> CurSelectedActor;
+	UPROPERTY()
+	TWeakObjectPtr<AActor> CurSelectedActor;
+
+
+//public types
+
+public:
 
 
 
 //public class access
 
 public:
+	//Begin Actor Selections Markers
+	UFUNCTION()
+	TWeakObjectPtr<AActor> GetCurSelectedActor() const {return CurSelectedActor;};
+	void SetCurSelectedActor(AActor* const NewActor);
+	void ClearActorSelection(){CurSelectedActor = nullptr;};
+	bool IsActorSelected() const {return (CurSelectedActor != nullptr);}
 
-/**Setters and getters*/
-UFUNCTION()
-TWeakObjectPtr<AActor> GetCurSelectedActor() const {return CurSelectedActor;};
+	//End Actor Selections Markers
 
-void SetCurSelectedActor(AActor* const NewActor){ CurSelectedActor = NewActor;};
-void ClearActorSelection(){CurSelectedActor = nullptr;};
-/**End Setters and getters*/
+	//Begin Actor Actions
+	void SelectActorUnderCursor();
+	void HandleSelectedActorAction(EMPCActionTypes ActionType);
+	//End Actor Actions
+
+
 
 
 
@@ -53,3 +79,8 @@ void ClearActorSelection(){CurSelectedActor = nullptr;};
 	
 	
 };
+
+
+
+
+

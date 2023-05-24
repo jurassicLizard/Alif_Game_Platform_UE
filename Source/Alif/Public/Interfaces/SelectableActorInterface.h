@@ -23,6 +23,8 @@ class ALIF_API ISelectableActorInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	virtual void OnSelectionGained() = 0;
+	virtual void OnPrimaryActionTrigger(FVector NewLocation) = 0;
 	
 	
 };

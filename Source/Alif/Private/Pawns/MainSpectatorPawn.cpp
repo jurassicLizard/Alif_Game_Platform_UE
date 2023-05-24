@@ -8,7 +8,8 @@
 
 
 #include "Pawns/MainSpectatorPawnMovement.h"
-#include "Pawns/MainCameraComponent.h" 	
+#include "Pawns/MainCameraComponent.h"
+#include "Controllers/MainPlayerController.h"	
 #include "EnhancedInput/StdInputMappingContext.h"
 #include "EnhancedInput/LookAction.h"
 #include "EnhancedInput/ZoomAction.h"
@@ -138,12 +139,28 @@ void AMainSpectatorPawn::TriggerZoom(const FInputActionValue& Value)
 
 void AMainSpectatorPawn::OnMouseLeft(const FInputActionValue& Value)
 {
-    UE_LOG(LogTemp, Warning, TEXT("Mouse Left Triggered"));
+    if(AMainPlayerController* PlayerController = Cast<AMainPlayerController>(GetController()))
+    {
+        if (!PlayerController->IsActorSelected())
+        {
+            PlayerController->SelectActorUnderCursor();
+        }else
+        {
+            PlayerController->HandleSelectedActorAction(EMPCActionTypes::PRIMARY);
+
+        }
+
+    }
 }
 
 void AMainSpectatorPawn::OnMouseRight(const FInputActionValue& Value)
 {
-    UE_LOG(LogTemp, Warning, TEXT("Mouse Right Triggered"));
+    if(AMainPlayerController* PlayerController = Cast<AMainPlayerController>(GetController()))
+    {
+        PlayerController->ClearActorSelection();
+
+
+    }
 }
 
 

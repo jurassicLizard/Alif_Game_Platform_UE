@@ -232,9 +232,7 @@ void UMainCameraComponent::UpdateCameraMovement( const APlayerController* InPlay
                 const float delta = float(MouseY - (ViewBottom - CameraActiveBorder)) / CameraActiveBorder;
                 SpectatorCameraSpeed = MaxAllowedScrollSpeed * delta;
                 CameraOffset.Y = -MouseBorderScrollSpeed * delta; // move forward
-                UE_LOG(LogTemp, Warning, TEXT("We are inside the bottom border zome"));
             }
-            // UE_LOG(LogTemp, Warning, TEXT("CameraOffset.X : %f, CameraOffset.Y : %f"), CameraOffset.X, CameraOffset.Y);
             Move2D(CameraOffset);
 
 
@@ -245,7 +243,6 @@ void UMainCameraComponent::UpdateCameraMovement( const APlayerController* InPlay
                 if(DefaultSpectatorPawnMovement)
                 {
                    DefaultSpectatorPawnMovement->MaxSpeed = SpectatorCameraSpeed;
-                   UE_LOG(LogTemp, Warning, TEXT("We are THere in the Player Camera speed thingy !"));
 
                 }
             }           

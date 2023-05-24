@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
+#include "Interfaces/SelectableActorInterface.h"
 #include "MainSquadCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ALIF_API AMainSquadCharacter : public ABaseCharacter
+class ALIF_API AMainSquadCharacter : public ABaseCharacter, public ISelectableActorInterface
 {
 	GENERATED_BODY()
 
@@ -18,6 +19,12 @@ class ALIF_API AMainSquadCharacter : public ABaseCharacter
 public:
 
 	AMainSquadCharacter();
+
+protected:
+	void OnSelectionGained() override;
+	void OnPrimaryActionTrigger(FVector NewLocation) override;
+	void Tick(float DeltaTime) override;
+
 /**End Class Interface*/
 	
 	
