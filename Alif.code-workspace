@@ -6,15 +6,11 @@
 		},
 		{
 			"name": "UE5",
-			"path": "/home/deck/git_repos/UnrealEngine"
+			"path": "/home/salem/git_repos/UnrealEngine"
 		}
 	],
 	"settings": {
-		"typescript.tsc.autoDetect": "off",
-		"UEIntellisenseFixes.compiler.path": "/home/deck/git_repos/UnrealEngine/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v20_clang-13.0.1-centos7/x86_64-unknown-linux-gnu/bin/clang++",
-		"files.associations": {
-			"*.t": "cpp"
-		}
+		"typescript.tsc.autoDetect": "off"
 	},
 	"extensions": {
 		"recommendations": [
