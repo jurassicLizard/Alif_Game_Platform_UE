@@ -5,6 +5,9 @@
 #include "Components/CapsuleComponent.h"
 #include "AIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+
+#include "Items/Weapons/Rifles/PrototypeRifle.h"
 
 
 
@@ -23,6 +26,31 @@ AMainSquadCharacter::AMainSquadCharacter()
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -94.0f), FQuat(FRotator(0.0f, -90.0f, 0.0f)));
 
 
+}
+
+void AMainSquadCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	//temporary code specific to wraith character
+	
+	if(USkeletalMeshComponent* CharMesh = GetMesh())
+	{
+		CharMesh->HideBoneByName(TEXT("weapon_r"),EPhysBodyOp::PBO_None);
+		MainWeaponObj = GetWorld()->SpawnActor<APrototypeRifle>(APrototypeRifle::StaticClass());
+		if(MainWeaponObj.IsValid())
+		{
+			MainWeaponObj->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform,TEXT("WeaponRSocket"));
+		}else
+		{
+			UE_LOG(LogTemp, Error, TEXT("We have a null pointer mesh at %s"),*GetName());
+		}
+		
+
+	}else
+	{
+		UE_LOG(LogTemp, Error, TEXT("We have a null pointer mesh at %s"),*GetName());
+	}
+	//end temporary code
 }
 
 void AMainSquadCharacter::Tick(float DeltaTime)

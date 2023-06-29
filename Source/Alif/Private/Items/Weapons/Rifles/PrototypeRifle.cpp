@@ -5,4 +5,9 @@
 
 
 
-
+APrototypeRifle::APrototypeRifle()
+{
+    ConstructorHelpers::FObjectFinder<USkeletalMesh> RifleSkeletalMeshHelper(TEXT("/Game/AssetPacks/ShooterGame/Weapons/Rifle"));
+	RifleSkeletalMesh = RifleSkeletalMeshHelper.Object;
+	BaseItemSkelMeshComp->SetSkeletalMesh(RifleSkeletalMesh.Get());
+}

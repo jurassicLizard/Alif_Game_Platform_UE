@@ -14,7 +14,19 @@ class ALIF_API APrototypeRifle : public ABaseItem
 {
 	GENERATED_BODY()
 	
-	
+
+public:
+
+	APrototypeRifle();
+
+
+
+
+private:
+
+UPROPERTY()
+TWeakObjectPtr<USkeletalMesh> RifleSkeletalMesh;
+
 	
 	
 };

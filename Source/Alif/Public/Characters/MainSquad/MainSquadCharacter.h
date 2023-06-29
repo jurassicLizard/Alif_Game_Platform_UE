@@ -19,6 +19,7 @@ class ALIF_API AMainSquadCharacter : public ABaseCharacter, public ISelectableAc
 public:
 
 	AMainSquadCharacter();
+	void BeginPlay() override;
 
 protected:
 	void OnSelectionGained() override;
@@ -26,7 +27,12 @@ protected:
 	void Tick(float DeltaTime) override;
 
 /**End Class Interface*/
-	
+
+
+private:
+
+UPROPERTY()
+TWeakObjectPtr<class APrototypeRifle> MainWeaponObj;
 	
 	
 };

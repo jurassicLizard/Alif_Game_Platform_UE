@@ -8,21 +8,16 @@
 ABaseItem::ABaseItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
-}
-
-// Called when the game starts or when spawned
-void ABaseItem::BeginPlay()
-{
-	Super::BeginPlay();
+	PrimaryActorTick.bCanEverTick = false;
+	BaseItemRootComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
+	SetRootComponent(BaseItemRootComp);
+	BaseItemSkelMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Base Item Skeletal Mesh"));
+	BaseItemSkelMeshComp->SetupAttachment(BaseItemRootComp);
+;
 	
-}
+	
 
-// Called every frame
-void ABaseItem::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
 }
+
 
