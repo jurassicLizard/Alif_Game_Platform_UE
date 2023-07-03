@@ -27,11 +27,33 @@ void AMainPlayerController::Tick(float DeltaTime)
 void AMainPlayerController::SelectActorUnderCursor()
 {
     FHitResult HitResult;
-    GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility,false,HitResult);
+    if(GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility,false,HitResult))
+    {
+        SetCurSelectedActor(HitResult.GetActor());
+    }
     // DrawDebugSphere(GetWorld(),HitResult.ImpactPoint,25.f,12,FColor::Red,false);
-    SetCurSelectedActor(HitResult.GetActor());
 }
 
+bool AMainPlayerController::SelectActorUnderCursorBySweep()
+{
+    //we only sweep if we have a cursor visibility hit
+    FHitResult HitResultCursor;
+    if(GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility,false,HitResultCursor))
+    {
+            if(GetWorld())
+            {
+            // DrawDebugSphere(GetWorld(),HitResult.ImpactPoint,25.f,12,FColor::Red,false);
+
+            //conduct sphere trace
+            //if colloding with curselected actor ignore
+            //else if colliding with other actor
+            }
+
+    }
+
+    return false;
+
+}
 void AMainPlayerController::HandleSelectedActorAction(EMPCActionTypes ActionType )
 {
     FHitResult HitResult;
@@ -64,8 +86,9 @@ void AMainPlayerController::SetCurSelectedActor(AActor *const NewActor)
         if(SelActor)
         {
             SelActor->OnSelectionGained();
+            CurSelectedActor = NewActor;
         }
-        CurSelectedActor = NewActor;
+        
       
     }else
     {

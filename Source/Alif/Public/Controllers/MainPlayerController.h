@@ -64,7 +64,11 @@ public:
 	//End Actor Selections Markers
 
 	//Begin Actor Actions
+	UFUNCTION()
 	void SelectActorUnderCursor();
+	UFUNCTION()
+	bool SelectActorUnderCursorBySweep();
+	UFUNCTION()
 	void HandleSelectedActorAction(EMPCActionTypes ActionType);
 	//End Actor Actions
 

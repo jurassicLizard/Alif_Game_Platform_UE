@@ -7,6 +7,7 @@
 #include "Interfaces/SelectableActorInterface.h"
 #include "MainSquadCharacter.generated.h"
 
+
 /**
  * 
  */
@@ -29,10 +30,17 @@ protected:
 /**End Class Interface*/
 
 
+
+
+
 private:
 
 UPROPERTY()
-TWeakObjectPtr<class APrototypeRifle> MainWeaponObj;
-	
+TWeakObjectPtr<class ABaseItem> MainWeaponObj;
+
+
+
+
+
 	
 };

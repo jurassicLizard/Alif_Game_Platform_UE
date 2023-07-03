@@ -2,6 +2,7 @@
 
 
 #include "Items/BaseItem.h"
+#include "Components/SphereComponent.h"
 
 
 // Sets default values
@@ -12,8 +13,7 @@ ABaseItem::ABaseItem()
 	BaseItemRootComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
 	SetRootComponent(BaseItemRootComp);
 	BaseItemSkelMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Base Item Skeletal Mesh"));
-	BaseItemSkelMeshComp->SetupAttachment(BaseItemRootComp);
-;
+	BaseItemSkelMeshComp->SetupAttachment(BaseItemRootComp); //UPDATE GetLowestChildFunction whenever this changes
 	
 	
 

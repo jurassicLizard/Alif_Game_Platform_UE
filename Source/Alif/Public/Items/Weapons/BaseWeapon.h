@@ -3,24 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Items/Weapons/BaseWeapon.h"
-#include "PrototypeRifle.generated.h"
+#include "Items/BaseItem.h"
+#include "BaseWeapon.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ALIF_API APrototypeRifle : public ABaseWeapon
+class ALIF_API ABaseWeapon : public ABaseItem
 {
 	GENERATED_BODY()
 	
 
-public:
 
-	APrototypeRifle();
+protected:
 
-
-
+	virtual bool IsWeapon() override {return true;}
 	
 	
 };

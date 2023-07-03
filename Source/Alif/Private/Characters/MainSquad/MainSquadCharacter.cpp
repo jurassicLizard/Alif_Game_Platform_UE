@@ -36,6 +36,7 @@ void AMainSquadCharacter::BeginPlay()
 	if(USkeletalMeshComponent* CharMesh = GetMesh())
 	{
 		CharMesh->HideBoneByName(TEXT("weapon_r"),EPhysBodyOp::PBO_None);
+
 		MainWeaponObj = GetWorld()->SpawnActor<APrototypeRifle>(APrototypeRifle::StaticClass());
 		if(MainWeaponObj.IsValid())
 		{
@@ -44,6 +45,7 @@ void AMainSquadCharacter::BeginPlay()
 		{
 			UE_LOG(LogTemp, Error, TEXT("We have a null pointer mesh at %s"),*GetName());
 		}
+		
 		
 
 	}else
@@ -80,6 +82,9 @@ void AMainSquadCharacter::Tick(float DeltaTime)
 
 	
 }
+
+
+
 
 //Interface Implementation
 void AMainSquadCharacter::OnSelectionGained()

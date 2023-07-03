@@ -8,6 +8,15 @@
 APrototypeRifle::APrototypeRifle()
 {
     ConstructorHelpers::FObjectFinder<USkeletalMesh> RifleSkeletalMeshHelper(TEXT("/Game/AssetPacks/ShooterGame/Weapons/Rifle"));
-	RifleSkeletalMesh = RifleSkeletalMeshHelper.Object;
-	BaseItemSkelMeshComp->SetSkeletalMesh(RifleSkeletalMesh.Get());
+	if(GetItemMesh())
+	{
+		GetItemMesh()->SetSkeletalMesh(RifleSkeletalMeshHelper.Object);
+	}else
+    {
+        UE_LOG(LogTemp, Error, TEXT("We are not properly initializing ItemMesh under %s"), *GetName());
+    }
+
+	
 }
+
+
