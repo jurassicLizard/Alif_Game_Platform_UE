@@ -5,11 +5,12 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 
-#include "SelectableActorInterface.generated.h"
+#include "PickupCapabilityInterface.generated.h"
 
+class ABaseItem;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class USelectableActorInterface : public UInterface
+class UPickupCapabilityInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,15 +18,17 @@ class USelectableActorInterface : public UInterface
 /**
  * 
  */
-class ALIF_API ISelectableActorInterface
+
+class ALIF_API IPickupCapabilityInterface
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void OnSelectionGained() = 0;
-	virtual void OnPrimaryActionTrigger(FVector NewLocation) = 0;
-	virtual void OnSecondaryActionTrigger(FVector NewLocation) = 0;
+	virtual void OnTriggeredPickupCmd(const ABaseItem* PickedUpActorCandidate) = 0;
+	virtual void OnCancelledPickupCmd() = 0;
+	virtual bool CanQueryMoveState() {return false;}
+	virtual bool IsMoving() = 0;
 	
 	
 };

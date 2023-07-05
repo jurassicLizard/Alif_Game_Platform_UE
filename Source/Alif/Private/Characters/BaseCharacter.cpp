@@ -4,9 +4,14 @@
 #include "Characters/BaseCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "Characters/CapabilityComponents/InventoryCapabilityComponent.h"
+#include "Characters/CapabilityComponents/PickupCapabilityComponent.h"
+
 
 // Sets default values
-ABaseCharacter::ABaseCharacter()
+ABaseCharacter::ABaseCharacter():
+	InventoryCapabilityComp(nullptr),
+	PickupCapabilityComp(nullptr)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bStartWithTickEnabled = false;

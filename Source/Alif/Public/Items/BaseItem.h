@@ -26,12 +26,22 @@ protected:
 private:
 	UPROPERTY(VisibleDefaultsOnly,Category="Base Item")
 	USceneComponent* BaseItemRootComp;
+
 protected:
 	UPROPERTY(VisibleDefaultsOnly,Category="Base Item")
 	USkeletalMeshComponent* BaseItemSkelMeshComp;
+	
+	UPROPERTY(VisibleDefaultsOnly,Category="Base Item")
+	class UFloatingPickableComponent* FloatingPickableComponent;
 
+
+protected:
 	UFUNCTION()
 	USkeletalMeshComponent* GetItemMesh() const {return BaseItemSkelMeshComp;}
+
+public:
+	UFUNCTION()
+	bool HasPickableCapability() const {return (FloatingPickableComponent != nullptr);}
 
 
 

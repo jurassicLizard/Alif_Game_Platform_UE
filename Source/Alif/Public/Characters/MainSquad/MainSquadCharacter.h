@@ -5,14 +5,18 @@
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
 #include "Interfaces/SelectableActorInterface.h"
+#include "Interfaces/PickupCapabilityInterface.h"
+
 #include "MainSquadCharacter.generated.h"
 
 
 /**
  * 
  */
+class ABaseItem;
+
 UCLASS()
-class ALIF_API AMainSquadCharacter : public ABaseCharacter, public ISelectableActorInterface
+class ALIF_API AMainSquadCharacter : public ABaseCharacter, public ISelectableActorInterface, public IPickupCapabilityInterface
 {
 	GENERATED_BODY()
 
@@ -23,20 +27,26 @@ public:
 	void BeginPlay() override;
 
 protected:
-	void OnSelectionGained() override;
-	void OnPrimaryActionTrigger(FVector NewLocation) override;
-	void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override;
+
 
 /**End Class Interface*/
 
 
+/**Implemented Interface*/
+
+protected:
+	virtual void OnSelectionGained() override;
+	virtual void OnPrimaryActionTrigger(FVector NewLocation) override;
+	virtual void OnSecondaryActionTrigger(FVector NewLocation) override;
+	virtual void OnTriggeredPickupCmd(const ABaseItem* PickedUpActorCandidate) override;
+	virtual void OnCancelledPickupCmd() override;
+	virtual bool CanQueryMoveState() override;
+	virtual bool IsMoving() override;
 
 
+/**End Implemented Interface*/
 
-private:
-
-UPROPERTY()
-TWeakObjectPtr<class ABaseItem> MainWeaponObj;
 
 
 

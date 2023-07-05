@@ -20,12 +20,6 @@ public:
 	APrototypeCannon();
 	
 
-private:
-
-	UPROPERTY()
-	class UFloatingPickableComponent* FloatingPickableComponent;
-
-
 public:
 	UFUNCTION()
 	const UFloatingPickableComponent* GetFloatingPickableComponent() const {return FloatingPickableComponent;};

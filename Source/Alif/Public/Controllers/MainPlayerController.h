@@ -43,6 +43,15 @@ private:
 
 	UPROPERTY()
 	TWeakObjectPtr<AActor> CurSelectedActor;
+	float PickableSphereTraceRadius;
+	FVector PickableSphereTraceZOffset;
+
+
+private:
+	UFUNCTION()
+	bool SweepSphereAtLocation(FHitResult& HitResultOut,FVector SweepLocation);
+	UFUNCTION()
+	bool CheckIfPickupPossible(AActor const* SelectedActorIn,AActor const* PickupItemIn) const;
 
 
 //public types

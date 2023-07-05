@@ -8,7 +8,8 @@
 #include "Components/SkeletalMeshComponent.h"
 
 #include "Items/Weapons/Rifles/PrototypeRifle.h"
-
+#include "Characters/CapabilityComponents/InventoryCapabilityComponent.h"
+#include "Characters/CapabilityComponents/PickupCapabilityComponent.h"
 
 
 
@@ -25,6 +26,20 @@ AMainSquadCharacter::AMainSquadCharacter()
 	//Set the location and rotation of the Character Mesh Transform
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -94.0f), FQuat(FRotator(0.0f, -90.0f, 0.0f)));
 
+	//Begin Actor components section
+
+	InventoryCapabilityComp = CreateDefaultSubobject<UInventoryCapabilityComponent>(TEXT("Inventory Component"));
+
+	AddOwnedComponent(InventoryCapabilityComp);
+
+	PickupCapabilityComp = CreateDefaultSubobject<UPickupCapabilityComponent>(TEXT("Pickup Capability Component"));
+
+	AddOwnedComponent(PickupCapabilityComp);
+	
+	//End Actor components section
+
+	
+
 
 }
 
@@ -35,16 +50,46 @@ void AMainSquadCharacter::BeginPlay()
 	
 	if(USkeletalMeshComponent* CharMesh = GetMesh())
 	{
+		if(!GetWorld()) 
+		{
+			UE_LOG(LogTemp, Error, TEXT("Something terrible has happend the world hasnot be created yet : %s"),*GetName());
+			return;
+		}
+
+		//Hide existing weapon we dont want
 		CharMesh->HideBoneByName(TEXT("weapon_r"),EPhysBodyOp::PBO_None);
 
-		MainWeaponObj = GetWorld()->SpawnActor<APrototypeRifle>(APrototypeRifle::StaticClass());
-		if(MainWeaponObj.IsValid())
+
+
+		if(HasInventoryCapability())
 		{
-			MainWeaponObj->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform,TEXT("WeaponRSocket"));
+					UE_LOG(LogTemp, Warning, TEXT("Has Inventory Attempting to populate : %s"),*GetName());
+					bool bSuccessAdd = GetInventoryCapabilityComponent()->AddMainWeaponToInventory(GetWorld()->SpawnActor<APrototypeRifle>(APrototypeRifle::StaticClass()));
+
+					if(bSuccessAdd)
+					{
+							
+						TWeakObjectPtr<ABaseWeapon> MainWeaponObj = GetInventoryCapabilityComponent()->GetMainWeapon();
+
+						if(MainWeaponObj.IsValid())
+						{
+							MainWeaponObj->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform,TEXT("WeaponRSocket"));
+						}else
+						{
+							UE_LOG(LogTemp, Error, TEXT("We have a null pointer mesh at %s"),*GetName());
+							UE_LOG(LogTemp, Error, TEXT("%s : Current Weapon inventory size is %d"),*GetName(),GetInventoryCapabilityComponent()->GetWeaponInventorySize())
+						}
+					}else
+					{
+						UE_LOG(LogTemp, Error, TEXT("%s : Failed to Add Main Weapon"));
+					}
+
+
 		}else
 		{
-			UE_LOG(LogTemp, Error, TEXT("We have a null pointer mesh at %s"),*GetName());
+			UE_LOG(LogTemp, Warning, TEXT("%s : Has no Inventory"),*GetName());
 		}
+
 		
 		
 
@@ -112,5 +157,51 @@ void AMainSquadCharacter::OnPrimaryActionTrigger(FVector NewLocation)
 
 
 
+}
+
+void AMainSquadCharacter::OnSecondaryActionTrigger(FVector NewLocation)
+{
+	
+}
+
+
+void AMainSquadCharacter::OnTriggeredPickupCmd(const ABaseItem* PickedUpActorCandidate)
+{
+	if(HasPickupCapability())
+	{
+		PickupCapabilityComp->QueuePickupCommand(PickedUpActorCandidate);
+
+	}else
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s : Implementing PickupCapabilityInterface but having no PickupCapabilityCOmponent is not possible . this is FATAL"),*GetName());
+	}
+
+}
+void AMainSquadCharacter::OnCancelledPickupCmd()
+{
+	if(HasPickupCapability())
+	{
+		PickupCapabilityComp->CancelPickupCommand();
+	}else
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s : Implementing PickupCapabilityInterface but having no PickupCapabilityCOmponent is not possible . this is FATAL"),*GetName());
+	}
+
+}
+
+/**Before calling this . check for validity in caller function using the CanQueryMoveState() virtual function , override with functionality if necessary*/
+bool AMainSquadCharacter::IsMoving()
+{
+	if(AAIController* CurController = Cast<AAIController>(GetController()))
+	{
+		return !(CurController->GetMoveStatus() == EPathFollowingStatus::Idle);
+	}
+
+	return false;
+}
+
+bool AMainSquadCharacter::CanQueryMoveState()
+{
+	return Cast<AAIController>(GetController());
 }
 //End Interface Implementation

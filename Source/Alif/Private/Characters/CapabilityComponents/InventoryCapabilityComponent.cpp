@@ -2,7 +2,7 @@
 
 
 #include "Characters/CapabilityComponents/InventoryCapabilityComponent.h"
-
+#include "Items/Weapons/BaseWeapon.h"
 
 // Sets default values for this component's properties
 UInventoryCapabilityComponent::UInventoryCapabilityComponent()
@@ -11,7 +11,6 @@ UInventoryCapabilityComponent::UInventoryCapabilityComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	WeaponsInventoryArray.SetNum(MaxWeapons);
 
 	// ...
 }
@@ -36,13 +35,35 @@ void UInventoryCapabilityComponent::TickComponent(float DeltaTime, ELevelTick Ti
 	// ...
 }
 
-bool UInventoryCapabilityComponent::AddWeaponToInventoryAtIdx(ABaseWeapon *NewBaseWeapon, int32 Idx)
+bool UInventoryCapabilityComponent::AddWeaponToInventoryAtIdx(ABaseWeapon const* NewBaseWeapon, int32 Idx)
 {
-	bool IsDuplicate = WeaponsInventoryArray.Find(NewBaseWeapon);
+	if(!NewBaseWeapon)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s : Attempting to Add a Null Weapon . this is fatal"),*GetReadableName());
+		return false;
+	}
+
+	bool IsDuplicate = (WeaponsInventoryArray.Find(const_cast<ABaseWeapon*>(NewBaseWeapon)) > 0);
+
 	if(!IsDuplicate)
 	{
-		WeaponsInventoryArray.Insert(NewBaseWeapon,Idx);
+		WeaponsInventoryArray.Insert(const_cast<ABaseWeapon*>(NewBaseWeapon),Idx);
 
 	}
-    return IsDuplicate;
+    return !IsDuplicate;
+}
+
+
+ABaseWeapon* UInventoryCapabilityComponent::GetWeaponAt(int32 Idx) const
+{
+	if(WeaponsInventoryArray.IsValidIndex(Idx) && WeaponsInventoryArray[Idx])
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s : Attempting to return Weapon with Name %s"),*GetReadableName(),*WeaponsInventoryArray[Idx]->GetName());
+		return WeaponsInventoryArray[Idx];
+	}else
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s : Attempting to access Weapon inventory at %d but nothing here"),*GetReadableName(),Idx);
+		return nullptr;
+	}
+
 }

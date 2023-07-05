@@ -6,10 +6,15 @@
 #include "Pawns/MainCameraComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Interfaces/SelectableActorInterface.h"
+#include "Interfaces/PickupCapabilityInterface.h"
+#include "Items/BaseItem.h"
+#include "Characters/BaseCharacter.h"
 
+#include "DrawDebugHelpers.h"
 
-
-AMainPlayerController::AMainPlayerController()
+AMainPlayerController::AMainPlayerController():
+    PickableSphereTraceRadius(50.f),
+    PickableSphereTraceZOffset(0.f,0.f,200.f)
 {
     PrimaryActorTick.bCanEverTick = true;
     bShowMouseCursor = true;
@@ -56,24 +61,147 @@ bool AMainPlayerController::SelectActorUnderCursorBySweep()
 }
 void AMainPlayerController::HandleSelectedActorAction(EMPCActionTypes ActionType )
 {
-    FHitResult HitResult;
-    GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility,false,HitResult);
+
 
     ISelectableActorInterface* SelActor = Cast<ISelectableActorInterface>(GetCurSelectedActor());
     if(!SelActor)
     {
         UE_LOG(LogTemp, Error, TEXT("%s has a fatal nullpointer exception, we are selecting something that doesnot implement a selectable interface"),*GetName());
         return;
-    }
-
-    if(EMPCActionTypes::PRIMARY == ActionType)
+    }else
     {
-        //we can only select actors that implement the ISelectableActorInterface nonethelsess we checked above for nullptr
-        // DrawDebugSphere(GetWorld(),HitResult.ImpactPoint,25.f,12,FColor::Red,false,5.f);
+            if(EMPCActionTypes::PRIMARY == ActionType)
+            {
+                FHitResult HitResultForMove;
+                if(GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility,false,HitResultForMove))
+                {
+                        //sweep under hitresult for any pickable and if yes take it
+                        FHitResult HitResultForPickup;
+                        IPickupCapabilityInterface* ActorThatPicksUp = Cast<IPickupCapabilityInterface>(GetCurSelectedActor().Get());
 
-        SelActor->OnPrimaryActionTrigger(HitResult.ImpactPoint);
+                        if(SweepSphereAtLocation(HitResultForPickup,HitResultForMove.ImpactPoint))
+                        {
+                            UE_LOG(LogTemp, Warning, TEXT("Hit Result reports following component hit %d"),*HitResultForPickup.GetComponent()->GetName());
+                            
+                            if(CheckIfPickupPossible(GetCurSelectedActor().Get(),HitResultForPickup.GetActor()))  //if it is . set pick up task as pending on actor
+                            {
+                                //QueuePickup (due to checks we are sure here that we implement PickupCapabilityInterface at actor level)                             
+                                if(ActorThatPicksUp){
+
+                                    //due to checks in CHeckIfPickupPossible  we are sure that the Cast to ABaseItem has worked, hence it is unchecked here
+
+                                    ActorThatPicksUp->OnTriggeredPickupCmd(Cast<ABaseItem>(HitResultForPickup.GetActor()));
+
+                                }else
+                                {
+                                    UE_LOG(LogTemp, Error, TEXT("%s : This shouldnot happen, somehow we were able to validate implemented interface but cannot cast to it"),*GetName());
+                                }
+
+                            }    
+                            
+                        }else if(ActorThatPicksUp)
+                        {
+
+                            //OnCancelPickupCommand because there is a change in move direction or a click somewhere else 
+                            ActorThatPicksUp->OnCancelledPickupCmd();
+
+                        }else
+                        {
+                            UE_LOG(LogTemp, Warning, TEXT("%s : Skipping Pickup for Actor that apparently doesnot support pickup"),*GetName());
+                        }
+                        //we can only select actors that implement the ISelectableActorInterface nonethelsess we checked above for nullptr
+                        //after quering for pickup we move movable actor
+                        SelActor->OnPrimaryActionTrigger(HitResultForMove.ImpactPoint);
+
+                }
+
+            }
 
     }
+
+
+}
+
+bool AMainPlayerController::CheckIfPickupPossible(AActor const* SelectedActorIn,AActor const* PickupItemIn) const
+{
+    //we should check before calling this . if SelectedActor is actually Selectable
+    ABaseCharacter* SelectedActorPtr = Cast<ABaseCharacter>(const_cast<AActor*>(SelectedActorIn));
+    ABaseItem* PickableItemPtr = Cast<ABaseItem>(const_cast<AActor*>(PickupItemIn));
+
+        //check for Item, if item is pickable
+    if(PickableItemPtr)
+    {
+        
+        if(SelectedActorPtr && PickableItemPtr->HasPickableCapability())
+        {
+
+            if(SelectedActorPtr)
+            {
+
+                                                //check for actor if actor can pickup
+                if(SelectedActorPtr->HasPickupCapability())
+                {
+                    if(SelectedActorPtr->GetClass()->ImplementsInterface(UPickupCapabilityInterface::StaticClass()))
+                    {
+                        return true;
+                    }else
+                    {
+                        UE_LOG(LogTemp, Error, TEXT("%s : Actor has Pickup Capability but doesnot implement Pickup Interface . this is fatal"),*GetName());
+                    }
+
+                }
+
+            }else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("%s : Selected Actor is not a Base Character"),*GetName());
+            }
+
+        }else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("%s : Attempting to pick up item with no pickable capability. skipping"),*GetName());
+        }
+
+
+    }else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("%s : Attempting to pick up invalid item. can only pickup ABaseItem"),*GetName());
+    }
+
+
+    return false;
+}
+
+
+bool AMainPlayerController::SweepSphereAtLocation(FHitResult& HitResultOut,FVector SweepLocation)
+{
+    //TODO add simple collision form to cannon / pickable item in order to be able to query sweeps
+    if(GetWorld())
+    {
+        FCollisionShape SphereShape = FCollisionShape::MakeSphere(PickableSphereTraceRadius) ;
+        FVector Start = (SweepLocation + PickableSphereTraceZOffset);
+        FVector End = SweepLocation;
+
+        DrawDebugPoint(GetWorld(),End,5.f,FColor::Red,false,10.f);
+        DrawDebugPoint(GetWorld(),Start,5.f,FColor::Blue,false,10.f);
+        DrawDebugSphere(GetWorld(),Start,PickableSphereTraceRadius,12,FColor::Black,false,10.f);
+
+        
+
+
+        return GetWorld()->SweepSingleByChannel(HitResultOut,Start,End,FQuat::Identity, ECollisionChannel::ECC_Visibility,SphereShape);
+        
+        
+
+        
+
+    }else
+    {
+        UE_LOG(LogTemp, Error, TEXT("%s : Fatal Error .The World is not there yet"));
+    }
+
+
+
+    return false;
 }
 
 void AMainPlayerController::SetCurSelectedActor(AActor *const NewActor)
