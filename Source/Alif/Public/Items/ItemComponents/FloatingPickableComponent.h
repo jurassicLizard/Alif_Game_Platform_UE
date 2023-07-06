@@ -7,7 +7,7 @@
 #include "FloatingPickableComponent.generated.h"
 
 
-
+class UCapsuleComponent;
 
 UENUM()
 enum class EPickedState : uint8
@@ -46,8 +46,14 @@ private:
 	float TimeConstant;
 	UPROPERTY(VisibleDefaultsOnly,Category="Floating Idle Pickable", meta=(AllowPrivateAccess = "true"))
 	float RotationSpeed;
+	UPROPERTY(VisibleDefaultsOnly,Category="Floating Idle Pickable", meta=(AllowPrivateAccess = "true"))
+	UCapsuleComponent* PickableCapsuleComp;
+	FRotator CapsuleWorldRotationOffset;
+	FVector CapsuleWorldLocationOffset;
 	UPROPERTY()
 	EPickedState PickedState;
+
+	
 
 
 
@@ -56,6 +62,14 @@ private:
 
 	UFUNCTION()
 	float GetTransformedSine();
+
+protected:
+	UFUNCTION()
+	virtual USceneComponent* GetDesiredParentAttachmentPoint(); //virtual  for portability in order to allow for multi attachment to any item different than ABaseItem
+	void AddCapsuleWorldRotationOffset(FRotator WorldRotationOffset = FRotator(0.f,0.f,90.f)); //we provide the opportunity for child classes to override capsule parameters
+	void AddCapsuleWorldLocationOffset(FVector WorldLocationOffset = FVector(0.f,25.f,10.f));
+	void SetPickableCapsuleHalfHeight(float HalfHeight = 44.f);
+	void SetPickableCapsuleRadius(float Radius = 18.f);
 
 
 public:

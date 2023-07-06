@@ -8,6 +8,7 @@
 #include "Interfaces/SelectableActorInterface.h"
 #include "Interfaces/PickupCapabilityInterface.h"
 #include "Items/BaseItem.h"
+#include "Items/ItemComponents/FloatingPickableComponent.h"
 #include "Characters/BaseCharacter.h"
 
 #include "DrawDebugHelpers.h"
@@ -79,9 +80,8 @@ void AMainPlayerController::HandleSelectedActorAction(EMPCActionTypes ActionType
                         FHitResult HitResultForPickup;
                         IPickupCapabilityInterface* ActorThatPicksUp = Cast<IPickupCapabilityInterface>(GetCurSelectedActor().Get());
 
-                        if(SweepSphereAtLocation(HitResultForPickup,HitResultForMove.ImpactPoint))
+                        if(SweepSphereAtLocationForPickables(HitResultForPickup,HitResultForMove.ImpactPoint))
                         {
-                            UE_LOG(LogTemp, Warning, TEXT("Hit Result reports following component hit %d"),*HitResultForPickup.GetComponent()->GetName());
                             
                             if(CheckIfPickupPossible(GetCurSelectedActor().Get(),HitResultForPickup.GetActor()))  //if it is . set pick up task as pending on actor
                             {
@@ -171,8 +171,7 @@ bool AMainPlayerController::CheckIfPickupPossible(AActor const* SelectedActorIn,
     return false;
 }
 
-
-bool AMainPlayerController::SweepSphereAtLocation(FHitResult& HitResultOut,FVector SweepLocation)
+bool AMainPlayerController::SweepSphereAtLocationForPickables(FHitResult& HitResultOut,FVector SweepLocation)
 {
     //TODO add simple collision form to cannon / pickable item in order to be able to query sweeps
     if(GetWorld())
@@ -184,15 +183,24 @@ bool AMainPlayerController::SweepSphereAtLocation(FHitResult& HitResultOut,FVect
         DrawDebugPoint(GetWorld(),End,5.f,FColor::Red,false,10.f);
         DrawDebugPoint(GetWorld(),Start,5.f,FColor::Blue,false,10.f);
         DrawDebugSphere(GetWorld(),Start,PickableSphereTraceRadius,12,FColor::Black,false,10.f);
-
         
 
 
-        return GetWorld()->SweepSingleByChannel(HitResultOut,Start,End,FQuat::Identity, ECollisionChannel::ECC_Visibility,SphereShape);
-        
-        
+        TArray<FHitResult> TempHitResults;
+        if(GetWorld()->SweepMultiByChannel(TempHitResults,Start,End,FQuat::Identity,ECollisionChannel::ECC_Visibility,SphereShape))
+        {
 
-        
+            for(FHitResult& Res : TempHitResults)
+            {
+                if(Res.GetActor() && Res.GetActor()->GetComponentByClass(UFloatingPickableComponent::StaticClass()))
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("Hit Result reports following Pickable Actor hit %s"),*Res.GetActor()->GetName());
+
+                    HitResultOut=Res;
+                    return true;
+                }
+            }
+        }       
 
     }else
     {

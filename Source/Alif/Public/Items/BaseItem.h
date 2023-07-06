@@ -13,7 +13,6 @@ class ALIF_API ABaseItem : public AActor, public IItemIdentificationInterface
 	GENERATED_BODY()
 
 //BEGIN CLASS INTERFACE
-	
 public:	
 	// Sets default values for this actor's properties
 	ABaseItem();
@@ -38,6 +37,8 @@ protected:
 protected:
 	UFUNCTION()
 	USkeletalMeshComponent* GetItemMesh() const {return BaseItemSkelMeshComp;}
+	UFUNCTION()
+	virtual USceneComponent* GetChildrenAttachmentComp() const {return BaseItemSkelMeshComp;} //Overridable helper function for getting the item we want to attach any further components to
 
 public:
 	UFUNCTION()
@@ -46,7 +47,7 @@ public:
 
 
 
-
+friend UFloatingPickableComponent;	//this class needs to access a protected member of this hence we define it as friend (notice the lack of the class keyword when we put this below instead of above)
 	
 	
 };

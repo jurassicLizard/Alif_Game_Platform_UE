@@ -48,8 +48,9 @@ private:
 
 
 private:
-	UFUNCTION()
-	bool SweepSphereAtLocation(FHitResult& HitResultOut,FVector SweepLocation);
+	
+	UFUNCTION() /*this function sweeps for all actors that have the floatingpickablecomponent . i.e. all actors that are pickable*/
+	bool SweepSphereAtLocationForPickables(FHitResult& HitResultOut,FVector SweepLocation);
 	UFUNCTION()
 	bool CheckIfPickupPossible(AActor const* SelectedActorIn,AActor const* PickupItemIn) const;
 
