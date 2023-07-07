@@ -13,7 +13,7 @@ enum class EPickupCmdState : uint8
 	NONE = 0,
 	PENDING,
 	CANCELLING,
-	COMPLETED,
+	FINALIZING,
 	MAX
 };
 
@@ -40,16 +40,18 @@ private:
 	EPickupCmdState PickupCmdState;
 	UPROPERTY()
 	class ABaseItem* PendingItemToPickUp;
+	bool bIsValidComponentUse;
 
 private:
-	UFUNCTION()
 	bool ValidateUseableState();
-
+	/**Complete and reset transitions are private due to the fact that Queue and cancel transition to them and so are sufficient for access from other classes*/
+	void CompletePickupCommand();
+	void ResetPickupCommand();
 
 public:
+	UFUNCTION()
 	void QueuePickupCommand(const ABaseItem* PendingItemToPickUpNew);
 	void CancelPickupCommand();
-	void CompletePickupCommand();
 	EPickupCmdState GetPickupCmdState() const {return PickupCmdState;}
 	void SetPickupCmdState(EPickupCmdState NewPickupState) {PickupCmdState = NewPickupState;}
 

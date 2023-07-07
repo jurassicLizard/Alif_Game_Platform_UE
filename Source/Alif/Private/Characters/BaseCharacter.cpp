@@ -4,12 +4,14 @@
 #include "Characters/BaseCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+
 #include "Characters/CapabilityComponents/InventoryCapabilityComponent.h"
 #include "Characters/CapabilityComponents/PickupCapabilityComponent.h"
-
+#include "Characters/BaseCharMovementComponent.h"
 
 // Sets default values
-ABaseCharacter::ABaseCharacter():
+ABaseCharacter::ABaseCharacter(const FObjectInitializer& ObjectInitializer): 
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UBaseCharMovementComponent>(Super::CharacterMovementComponentName)),// We override the default movement component in order to set some protected values
 	InventoryCapabilityComp(nullptr),
 	PickupCapabilityComp(nullptr)
 {
@@ -17,16 +19,23 @@ ABaseCharacter::ABaseCharacter():
 	PrimaryActorTick.bStartWithTickEnabled = false;
 	PrimaryActorTick.bCanEverTick = false;
 	//set standard pawn settings
-
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false; //strategy top down game
 
 	//Set MovementSettings
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->bUseControllerDesiredRotation = false;
-	GetCharacterMovement()->bIgnoreBaseRotation = true;
-	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+	if(GetCharacterMovement())
+	{
+			GetCharacterMovement()->bOrientRotationToMovement = true;
+			GetCharacterMovement()->bUseControllerDesiredRotation = false;
+			GetCharacterMovement()->bIgnoreBaseRotation = true;
+			GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;			
+
+	}else
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s : unable to get character mesh component this is fatal"),*GetName());
+	}
+
 	
 
 

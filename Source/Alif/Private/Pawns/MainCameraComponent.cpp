@@ -307,8 +307,8 @@ void UMainCameraComponent::Move2D(FVector2D MoveOffset)
             const FVector WorldSpaceAccelForward = R.GetScaledAxis( EAxis::X );
 
             //TODO add deltatime handling and mouse speed by multiplying MoveOffset.X and MoveOffset.Y by an acceleration value * deltatime
-            GEngine->AddOnScreenDebugMessage(1,GetWorld()->GetDeltaSeconds(), FColor::Cyan, FString::Printf(TEXT("WorldSpaceAccelForward.X : %f, WorldSpaceAccelForward.Y :%f, Scale:%f"),WorldSpaceAccelForward.X,WorldSpaceAccelForward.Y,MoveOffset.Y));
-            GEngine->AddOnScreenDebugMessage(2,GetWorld()->GetDeltaSeconds(), FColor::Cyan, FString::Printf(TEXT("WorldSpaceAccelRight.X : %f, WorldSpaceAccelRight.Y :%f, Scale:%f"),WorldSpaceAccelRight.X,WorldSpaceAccelRight.Y,MoveOffset.X));
+            // GEngine->AddOnScreenDebugMessage(1,GetWorld()->GetDeltaSeconds(), FColor::Cyan, FString::Printf(TEXT("WorldSpaceAccelForward.X : %f, WorldSpaceAccelForward.Y :%f, Scale:%f"),WorldSpaceAccelForward.X,WorldSpaceAccelForward.Y,MoveOffset.Y));
+            // GEngine->AddOnScreenDebugMessage(2,GetWorld()->GetDeltaSeconds(), FColor::Cyan, FString::Printf(TEXT("WorldSpaceAccelRight.X : %f, WorldSpaceAccelRight.Y :%f, Scale:%f"),WorldSpaceAccelRight.X,WorldSpaceAccelRight.Y,MoveOffset.X));
 
             if(MoveOffset.X != 0)
             {

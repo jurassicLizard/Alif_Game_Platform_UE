@@ -44,12 +44,12 @@ bool AMainPlayerController::SelectActorUnderCursorBySweep()
 {
     //we only sweep if we have a cursor visibility hit
     FHitResult HitResultCursor;
-    if(GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility,false,HitResultCursor))
+    if(GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility,false,HitResultCursor))//TODO change visibility channel to something more specific
     {
             if(GetWorld())
             {
             // DrawDebugSphere(GetWorld(),HitResult.ImpactPoint,25.f,12,FColor::Red,false);
-
+            //TODO fix selection
             //conduct sphere trace
             //if colloding with curselected actor ignore
             //else if colliding with other actor
@@ -91,6 +91,7 @@ void AMainPlayerController::HandleSelectedActorAction(EMPCActionTypes ActionType
                                     //due to checks in CHeckIfPickupPossible  we are sure that the Cast to ABaseItem has worked, hence it is unchecked here
 
                                     ActorThatPicksUp->OnTriggeredPickupCmd(Cast<ABaseItem>(HitResultForPickup.GetActor()));
+                                    //TODO create seeparate ai controller class for our characters
 
                                 }else
                                 {
@@ -143,6 +144,7 @@ bool AMainPlayerController::CheckIfPickupPossible(AActor const* SelectedActorIn,
                 {
                     if(SelectedActorPtr->GetClass()->ImplementsInterface(UPickupCapabilityInterface::StaticClass()))
                     {
+                        UE_LOG(LogTemp, Warning, TEXT("%s : %s reports has pickup capability and is capable of picking up"),*GetName(),*SelectedActorPtr->GetName());
                         return true;
                     }else
                     {

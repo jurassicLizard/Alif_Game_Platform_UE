@@ -14,14 +14,28 @@
 
 
 
-AMainSquadCharacter::AMainSquadCharacter()
+AMainSquadCharacter::AMainSquadCharacter(const FObjectInitializer& ObjectInitializer):
+	Super(ObjectInitializer)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	PrimaryActorTick.bCanEverTick = true;
     //set primary capsule collision component settings
-	GetCapsuleComponent()->SetCapsuleHalfHeight(93.f);
-	GetCapsuleComponent()->SetCapsuleRadius(30.78f);
+	if(GetCapsuleComponent())
+	{
+		//Set base Capsule dimensions
+			GetCapsuleComponent()->SetCapsuleHalfHeight(93.f);
+			GetCapsuleComponent()->SetCapsuleRadius(30.78f);
+		//Set base collision settings
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+			GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility,ECollisionResponse::ECR_Block); //TODO create our own collision preset so that we dont have to manually modify instances
+
+	}else
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s : Getting a null pointer instead of our capsule component, something really terrible is happening here"),*GetName());
+	}
+
 
 	//Set the location and rotation of the Character Mesh Transform
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -94.0f), FQuat(FRotator(0.0f, -90.0f, 0.0f)));
@@ -38,7 +52,6 @@ AMainSquadCharacter::AMainSquadCharacter()
 	
 	//End Actor components section
 
-	
 
 
 }
@@ -47,7 +60,11 @@ void AMainSquadCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	//temporary code specific to wraith character
-	
+	if(!IsActorTickEnabled()) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s : is NOT alive and ticking "),*GetName());
+	}
+
 	if(USkeletalMeshComponent* CharMesh = GetMesh())
 	{
 		if(!GetWorld()) 
@@ -114,14 +131,14 @@ void AMainSquadCharacter::Tick(float DeltaTime)
 	{
 		if(MoveComp->GetCurrentAcceleration().Size()>0.f)
 		{
-		 	GEngine->AddOnScreenDebugMessage(3,GetWorld()->GetDeltaSeconds(), FColor::Blue, FString::Printf(TEXT("Acceleration Value : %f"), MoveComp->GetCurrentAcceleration().Size()));
+		 	GEngine->AddOnScreenDebugMessage(1,DeltaTime, FColor::Blue, FString::Printf(TEXT("Acceleration Value : %f"), MoveComp->GetCurrentAcceleration().Size()));
 
 		}
 
 
-		GEngine->AddOnScreenDebugMessage(5,GetWorld()->GetDeltaSeconds(), FColor::Blue, FString::Printf(TEXT("Velocity Value : %f"), Velocity.Size()));
+		GEngine->AddOnScreenDebugMessage(2,DeltaTime, FColor::Blue, FString::Printf(TEXT("Velocity Value : %f"), Velocity.Size()));
 
-		 GEngine->AddOnScreenDebugMessage(4,GetWorld()->GetDeltaSeconds(), FColor::Blue, FString::Printf(TEXT("TestVector Value : %f"), TestVector.Size()));
+		 GEngine->AddOnScreenDebugMessage(3,DeltaTime, FColor::Blue, FString::Printf(TEXT("TestVector Value : %f"), TestVector.Size()));
 
 	}
 

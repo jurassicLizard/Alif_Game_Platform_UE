@@ -23,11 +23,12 @@ class ALIF_API AMainSquadCharacter : public ABaseCharacter, public ISelectableAc
 /**Class Interface*/
 public:
 
-	AMainSquadCharacter();
-	void BeginPlay() override;
+	AMainSquadCharacter(const FObjectInitializer& ObjectInitializer);
+
 
 protected:
 	virtual void Tick(float DeltaTime) override;
+	void BeginPlay() override;
 
 
 /**End Class Interface*/

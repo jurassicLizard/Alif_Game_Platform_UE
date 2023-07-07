@@ -10,6 +10,7 @@
 UPickupCapabilityComponent::UPickupCapabilityComponent():
 	PickupCmdState(EPickupCmdState::NONE),
 	PendingItemToPickUp(nullptr),
+	bIsValidComponentUse(false),
 	DefaultWeaponSocket("WeaponRSocket")
 
 {
@@ -29,6 +30,7 @@ void UPickupCapabilityComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bIsValidComponentUse = ValidateUseableState();
 	// ...
 	
 }
@@ -39,9 +41,10 @@ void UPickupCapabilityComponent::TickComponent(float DeltaTime, ELevelTick TickT
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if(!ValidateUseableState())
+	if(!bIsValidComponentUse)
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s : Tick is unusable for PickupComponent it is useless due to unsatisfied must haves in %s"),*GetReadableName(),*GetName());
+		UE_LOG(LogTemp, Error, TEXT("%s : Tick is unusable  and will be disabled. it is useless due to unsatisfied must haves in %s"),*GetReadableName(),*GetName());
+		SetComponentTickEnabled(false);
 
 		return;
 			
@@ -57,18 +60,22 @@ void UPickupCapabilityComponent::TickComponent(float DeltaTime, ELevelTick TickT
 				case EPickupCmdState::PENDING :
 				{
 					//check if is Moving then we skip else we conduct pickup procedure and transition to completed
+					//TODO add unreal delegates here 
 
+
+					
 
 					break;
 				}
 				case EPickupCmdState::CANCELLING :
 				{
 					//we just completePickup and drop pending pickup command
-					CompletePickupCommand();
+					ResetPickupCommand();
 					break;
 				}
-				case EPickupCmdState::COMPLETED :
+				case EPickupCmdState::FINALIZING :
 				{
+					ResetPickupCommand();
 					break;
 				}
 
@@ -89,6 +96,7 @@ void UPickupCapabilityComponent::TickComponent(float DeltaTime, ELevelTick TickT
 void UPickupCapabilityComponent::QueuePickupCommand(const ABaseItem* PendingItemToPickUpNew)
 {
 	PickupCmdState = EPickupCmdState::PENDING;
+	UE_LOG(LogTemp, Warning, TEXT("%s : Queing pickup command"),*GetReadableName());
 	PendingItemToPickUp = const_cast<ABaseItem*>(PendingItemToPickUpNew);
 
 }
@@ -96,14 +104,24 @@ void UPickupCapabilityComponent::QueuePickupCommand(const ABaseItem* PendingItem
 void UPickupCapabilityComponent::CancelPickupCommand()
 {
 	PickupCmdState = EPickupCmdState::CANCELLING;
+	UE_LOG(LogTemp, Warning, TEXT("%s : Cancelling pickup command"),*GetReadableName());
+
 }
 
 
 void UPickupCapabilityComponent::CompletePickupCommand()
 {
-	PickupCmdState = EPickupCmdState::COMPLETED;
+	PickupCmdState = EPickupCmdState::FINALIZING;
+	UE_LOG(LogTemp, Warning, TEXT("%s : finishing pickup command"),*GetReadableName());
+
+}
+
+void UPickupCapabilityComponent::ResetPickupCommand()
+{
+	PickupCmdState = EPickupCmdState::NONE;
 	PendingItemToPickUp = nullptr;
-	SetPickupCmdState(EPickupCmdState::NONE);
+	UE_LOG(LogTemp, Warning, TEXT("%s : resetting pickup command"),*GetReadableName());
+
 }
 
 bool UPickupCapabilityComponent::PickUpWeapon(ABaseWeapon* BaseWeaponOut) const

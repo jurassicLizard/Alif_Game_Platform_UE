@@ -16,17 +16,16 @@ class ALIF_API ABaseCharacter : public ACharacter
 
 public:
 	// Sets default values for this character's properties
-	ABaseCharacter();
-
+	ABaseCharacter(const FObjectInitializer& ObjectInitializer);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleDefaultsOnly,Category="Base Character Pickup Capability")
 	UInventoryCapabilityComponent* InventoryCapabilityComp;
-	UPROPERTY()
+	UPROPERTY(VisibleDefaultsOnly,Category="Base Character Pickup Capability")
 	UPickupCapabilityComponent* PickupCapabilityComp;
 
 
