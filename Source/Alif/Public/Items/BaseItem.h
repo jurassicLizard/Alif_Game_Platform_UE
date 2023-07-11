@@ -40,9 +40,11 @@ protected:
 	UFUNCTION()
 	virtual USceneComponent* GetChildrenAttachmentComp() const {return BaseItemSkelMeshComp;} //Overridable helper function for getting the item we want to attach any further components to
 
+
 public:
 	UFUNCTION()
 	bool HasPickableCapability() const {return (FloatingPickableComponent != nullptr);}
+
 
 
 

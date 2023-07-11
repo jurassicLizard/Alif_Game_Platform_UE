@@ -2,6 +2,7 @@
 
 
 #include "Characters/BaseCharacter.h"
+#include "AlifLogging.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -33,7 +34,7 @@ ABaseCharacter::ABaseCharacter(const FObjectInitializer& ObjectInitializer):
 
 	}else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s : unable to get character mesh component this is fatal"),*GetName());
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : unable to get character mesh component this is fatal"),*GetName());
 	}
 
 	

@@ -2,6 +2,7 @@
 
 
 #include "Controllers/MainPlayerController.h"
+#include "AlifLogging.h"
 #include "Pawns/MainSpectatorPawn.h"
 #include "Pawns/MainCameraComponent.h"
 #include "DrawDebugHelpers.h"
@@ -67,7 +68,7 @@ void AMainPlayerController::HandleSelectedActorAction(EMPCActionTypes ActionType
     ISelectableActorInterface* SelActor = Cast<ISelectableActorInterface>(GetCurSelectedActor());
     if(!SelActor)
     {
-        UE_LOG(LogTemp, Error, TEXT("%s has a fatal nullpointer exception, we are selecting something that doesnot implement a selectable interface"),*GetName());
+        UE_LOG(LogAlifDebug, Error, TEXT("%s has a fatal nullpointer exception, we are selecting something that doesnot implement a selectable interface"),*GetName());
         return;
     }else
     {
@@ -95,7 +96,7 @@ void AMainPlayerController::HandleSelectedActorAction(EMPCActionTypes ActionType
 
                                 }else
                                 {
-                                    UE_LOG(LogTemp, Error, TEXT("%s : This shouldnot happen, somehow we were able to validate implemented interface but cannot cast to it"),*GetName());
+                                    UE_LOG(LogAlifDebug, Error, TEXT("%s : This shouldnot happen, somehow we were able to validate implemented interface but cannot cast to it"),*GetName());
                                 }
 
                             }    
@@ -108,7 +109,7 @@ void AMainPlayerController::HandleSelectedActorAction(EMPCActionTypes ActionType
 
                         }else
                         {
-                            UE_LOG(LogTemp, Warning, TEXT("%s : Skipping Pickup for Actor that apparently doesnot support pickup"),*GetName());
+                            UE_LOG(LogAlifDebug, Warning, TEXT("%s : Skipping Pickup for Actor that apparently doesnot support pickup"),*GetName());
                         }
                         //we can only select actors that implement the ISelectableActorInterface nonethelsess we checked above for nullptr
                         //after quering for pickup we move movable actor
@@ -144,29 +145,29 @@ bool AMainPlayerController::CheckIfPickupPossible(AActor const* SelectedActorIn,
                 {
                     if(SelectedActorPtr->GetClass()->ImplementsInterface(UPickupCapabilityInterface::StaticClass()))
                     {
-                        UE_LOG(LogTemp, Warning, TEXT("%s : %s reports has pickup capability and is capable of picking up"),*GetName(),*SelectedActorPtr->GetName());
+                        UE_LOG(LogAlifDebug, Warning, TEXT("%s : %s reports has pickup capability and is capable of picking up"),*GetName(),*SelectedActorPtr->GetName());
                         return true;
                     }else
                     {
-                        UE_LOG(LogTemp, Error, TEXT("%s : Actor has Pickup Capability but doesnot implement Pickup Interface . this is fatal"),*GetName());
+                        UE_LOG(LogAlifDebug, Error, TEXT("%s : Actor has Pickup Capability but doesnot implement Pickup Interface . this is fatal"),*GetName());
                     }
 
                 }
 
             }else
             {
-                UE_LOG(LogTemp, Warning, TEXT("%s : Selected Actor is not a Base Character"),*GetName());
+                UE_LOG(LogAlifDebug, Warning, TEXT("%s : Selected Actor is not a Base Character"),*GetName());
             }
 
         }else
         {
-            UE_LOG(LogTemp, Warning, TEXT("%s : Attempting to pick up item with no pickable capability. skipping"),*GetName());
+            UE_LOG(LogAlifDebug, Warning, TEXT("%s : Attempting to pick up item with no pickable capability. skipping"),*GetName());
         }
 
 
     }else
     {
-        UE_LOG(LogTemp, Warning, TEXT("%s : Attempting to pick up invalid item. can only pickup ABaseItem"),*GetName());
+        UE_LOG(LogAlifDebug, Warning, TEXT("%s : Attempting to pick up invalid item. can only pickup ABaseItem"),*GetName());
     }
 
 
@@ -196,7 +197,7 @@ bool AMainPlayerController::SweepSphereAtLocationForPickables(FHitResult& HitRes
             {
                 if(Res.GetActor() && Res.GetActor()->GetComponentByClass(UFloatingPickableComponent::StaticClass()))
                 {
-                    UE_LOG(LogTemp, Warning, TEXT("Hit Result reports following Pickable Actor hit %s"),*Res.GetActor()->GetName());
+                    UE_LOG(LogAlifDebug, Warning, TEXT("Hit Result reports following Pickable Actor hit %s"),*Res.GetActor()->GetName());
 
                     HitResultOut=Res;
                     return true;
@@ -206,7 +207,7 @@ bool AMainPlayerController::SweepSphereAtLocationForPickables(FHitResult& HitRes
 
     }else
     {
-        UE_LOG(LogTemp, Error, TEXT("%s : Fatal Error .The World is not there yet"));
+        UE_LOG(LogAlifDebug, Error, TEXT("%s : Fatal Error .The World is not there yet"));
     }
 
 
@@ -219,7 +220,7 @@ void AMainPlayerController::SetCurSelectedActor(AActor *const NewActor)
     if(NewActor && 
         NewActor->GetClass()->ImplementsInterface(USelectableActorInterface::StaticClass()))
     {
-        UE_LOG(LogTemp, Warning, TEXT("Attempting to select %s"),*NewActor->GetActorNameOrLabel());  
+        UE_LOG(LogAlifDebug, Warning, TEXT("Attempting to select %s"),*NewActor->GetActorNameOrLabel());  
         ISelectableActorInterface* SelActor = Cast<ISelectableActorInterface>(NewActor);
         if(SelActor)
         {
@@ -254,7 +255,7 @@ void AMainPlayerController::PostProcessInput(const float DeltaTime, const bool b
 
                     if(bIsGameStateValid)
                     {
-                        // UE_LOG(LogTemp, Warning, TEXT("We are THere in the Player Controller !"));
+                        // UE_LOG(LogAlifDebug, Warning, TEXT("We are THere in the Player Controller !"));
                         SpectatorPawn->GetMainCameraComponent()->UpdateCameraMovement(this);
 
                     }

@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "PickupCapabilityComponent.generated.h"
 
+class ABaseItem;
 
 UENUM()
 enum class EPickupCmdState : uint8
@@ -70,8 +71,6 @@ public:
 	FString& GetWeaponSocket() {return DefaultWeaponSocket;}
 	UFUNCTION()
 	void SetWeaponSocket(const FString& NewSocketName) {DefaultWeaponSocket = NewSocketName;}
-	UFUNCTION()
-	bool PickUpWeapon(class ABaseWeapon* BaseWeaponOut) const;
 
 
 

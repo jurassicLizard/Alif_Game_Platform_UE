@@ -2,7 +2,7 @@
 
 
 #include "Items/ItemComponents/FloatingPickableComponent.h"
-
+#include "AlifLogging.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
@@ -21,7 +21,7 @@ UFloatingPickableComponent::UFloatingPickableComponent():
 	if(GetOwner() && GetDesiredParentAttachmentPoint())
 	{
 		PickableCapsuleComp = CreateDefaultSubobject<UCapsuleComponent>("Pickable Item Capsule Comp");
-		UE_LOG(LogTemp, Warning, TEXT("%s Capsule Component is not attached as root . this may cause problems when using native unreal functions like move to location. use this at your own discretion"),*GetReadableName());
+		UE_LOG(LogAlifDebug, Warning, TEXT("%s Capsule Component is not attached as root . this may cause problems when using native unreal functions like move to location. use this at your own discretion"),*GetReadableName());
 		/**Begin Conduct Capsule transforms*/
 		AddCapsuleWorldLocationOffset();
 		AddCapsuleWorldRotationOffset();
@@ -32,10 +32,9 @@ UFloatingPickableComponent::UFloatingPickableComponent():
 		PickableCapsuleComp->SetGenerateOverlapEvents(true);
 		PickableCapsuleComp->SetupAttachment(GetDesiredParentAttachmentPoint());
 
-
 	}else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s : The Owning Actor Doesnot Exist or This is the default class or we are attaching this component to a nullptr"),*GetReadableName());
+		UE_LOG(LogAlifDebug, Warning, TEXT("%s : The Owning Actor Doesnot Exist or This is the default class or we are attaching this component to a nullptr"),*GetReadableName());
 	}
 
 
@@ -61,21 +60,51 @@ void UFloatingPickableComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 	if(GetOwner())
 	{
-		GetOwner()->AddActorWorldOffset(FVector(0.f,0.f,GetTransformedSine()));
+		if(!GetOwner()->GetAttachParentActor())
+		{
+			SetPickedState(EPickedState::DROPPED);
 
-		FRotator RotationOffset = FRotator(0.f,(RotationSpeed * DeltaTime),0.f);
+		}else
+		{
+			SetPickedState(EPickedState::PICKED);
 
-		GetOwner()->AddActorWorldRotation(RotationOffset);
+		}
+
+		if(GetPickedState() == EPickedState::DROPPED)
+		{
+			HandleDroppedState(DeltaTime);
+		}
+
 
 	}else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s reports no owner attached to it and can therefore not conduct its tasks"),*GetName());
+		UE_LOG(LogAlifDebug, Warning, TEXT("%s reports no owner attached to it and can therefore not conduct its tasks"),*GetName());
 
 	}
 
 	// ...
 }
 
+void UFloatingPickableComponent::SetPickedState(EPickedState const& NewPickedState) 
+{ 
+	if(NewPickedState != GetPickedState())
+	{
+		PickedState = NewPickedState;
+		FString PickedString = ((GetPickedState() == EPickedState::DROPPED) ? "Dropped" : "Picked");
+		UE_LOG(LogAlifDebug, Display, TEXT("%s : Setting picked State for %s to %s"),*GetReadableName(),*GetOwner()->GetName(),*PickedString);
+
+	}
+
+}
+void UFloatingPickableComponent::HandleDroppedState(float DeltaTime)
+{
+		GetOwner()->AddActorWorldOffset(FVector(0.f,0.f,GetTransformedSine()));
+
+		FRotator RotationOffset = FRotator(0.f,(RotationSpeed * DeltaTime),0.f);
+
+		GetOwner()->AddActorWorldRotation(RotationOffset);
+
+}
 
 float UFloatingPickableComponent::GetTransformedSine()
 {
@@ -101,7 +130,7 @@ void UFloatingPickableComponent::AddCapsuleWorldRotationOffset(FRotator WorldRot
 		PickableCapsuleComp->AddWorldRotation(WorldRotationOffset);
 	}else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s : Attempting to add offset on a non existing capsule. Aborting"),*GetReadableName());
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to add offset on a non existing capsule. Aborting"),*GetReadableName());
 	}
 }
 
@@ -112,7 +141,7 @@ void UFloatingPickableComponent::AddCapsuleWorldLocationOffset(FVector WorldLoca
 		PickableCapsuleComp->AddWorldOffset(WorldLocationOffset);
 	}else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s : Attempting to add offset on a non existing capsule. Aborting"),*GetReadableName());
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to add offset on a non existing capsule. Aborting"),*GetReadableName());
 	}
 
 }
@@ -125,7 +154,7 @@ void UFloatingPickableComponent::SetPickableCapsuleHalfHeight(float HalfHeight/*
 		PickableCapsuleComp->SetCapsuleHalfHeight(HalfHeight);
 	}else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s : Attempting to modify a non existing capsule. Aborting"),*GetReadableName());
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to modify a non existing capsule. Aborting"),*GetReadableName());
 	}
 }
 
@@ -137,7 +166,7 @@ void UFloatingPickableComponent::SetPickableCapsuleRadius(float Radius/**default
 		PickableCapsuleComp->SetCapsuleRadius(Radius);
 	}else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s : Attempting to modify a non existing capsule. Aborting"),*GetReadableName());
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to modify a non existing capsule. Aborting"),*GetReadableName());
 	}
 
 }

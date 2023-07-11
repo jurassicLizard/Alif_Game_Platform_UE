@@ -34,16 +34,29 @@ protected:
 /**End Class Interface*/
 
 
+
+private:
+
+	FName WeaponMainSocketName;
+	FName BackpackSocketName;
 /**Implemented Interface*/
 
 protected:
 	virtual void OnSelectionGained() override;
 	virtual void OnPrimaryActionTrigger(FVector NewLocation) override;
 	virtual void OnSecondaryActionTrigger(FVector NewLocation) override;
+	UFUNCTION()
 	virtual void OnTriggeredPickupCmd(const ABaseItem* PickedUpActorCandidate) override;
 	virtual void OnCancelledPickupCmd() override;
 	virtual bool CanQueryMoveState() override;
 	virtual bool IsMoving() override;
+	UFUNCTION()
+	virtual void PickUpItem(const ABaseItem* ItemToPickUp) override;
+	UFUNCTION()
+	virtual void DropItem(const ABaseItem* ItemToDrop) override;
+	UFUNCTION()
+	virtual void StowItem(const ABaseItem* ItemToStow) override;
+
 
 
 /**End Implemented Interface*/

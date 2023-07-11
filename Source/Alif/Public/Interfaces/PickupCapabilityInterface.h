@@ -27,8 +27,13 @@ class ALIF_API IPickupCapabilityInterface
 public:
 	virtual void OnTriggeredPickupCmd(const ABaseItem* PickedUpActorCandidate) = 0;
 	virtual void OnCancelledPickupCmd() = 0;
+
 	virtual bool CanQueryMoveState() {return false;}
 	virtual bool IsMoving() = 0;
+
+	virtual void PickUpItem(const ABaseItem* ItemToPickUp) = 0;
+	virtual void DropItem(const ABaseItem* ItemToDrop) = 0;
+	virtual void StowItem(const ABaseItem* ItemToStow) = 0;
 	
 	
 };

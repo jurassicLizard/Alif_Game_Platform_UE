@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Pawns/MainSpectatorPawn.h"
-
+#include "AlifLogging.h"
 #include "Components/SphereComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h" 
@@ -81,14 +81,14 @@ void AMainSpectatorPawn::SetupPlayerInputComponent(UInputComponent *InputCompone
     if(LookAction == nullptr ||
         ZoomAction == nullptr)
     {
-        UE_LOG(LogTemp, Error, TEXT("We Cannot Move / Only Partially move. this is fatal"));
+        UE_LOG(LogAlifDebug, Error, TEXT("We Cannot Move / Only Partially move. this is fatal"));
     }
 
     
     if(SelectAction == nullptr ||
         ReleaseAction == nullptr)
     {
-        UE_LOG(LogTemp, Error, TEXT("We Cannot use any selection or release options. this is fatal"));
+        UE_LOG(LogAlifDebug, Error, TEXT("We Cannot use any selection or release options. this is fatal"));
     }
 
  

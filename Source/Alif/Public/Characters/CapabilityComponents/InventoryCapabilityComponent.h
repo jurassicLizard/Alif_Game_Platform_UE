@@ -10,6 +10,8 @@
 
 
 class ABaseWeapon;
+class ABaseItem;
+class IPickupCapabilityInterface;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ALIF_API UInventoryCapabilityComponent : public UActorComponent
@@ -31,11 +33,27 @@ public:
 
 private:
 
-	uint8 MaxWeapons = 30;
+	uint8 MaxWeapons = 2;
 	UPROPERTY()
-	TArray<ABaseWeapon*> WeaponsInventoryArray; //update MaxWeapons for more efficiency in case our weapons exceed 30
+	TArray<ABaseWeapon*> WeaponsInventoryArray;
+	UPROPERTY()
+	ABaseItem* ItemPendingStowAwayAction;
+	UPROPERTY()
+	ABaseItem* ItemPendingDropAction;
 
+private:
 
+	UFUNCTION()
+	bool RemoveWeaponFromInventory(ABaseWeapon const* DeletedBaseWeapon){return (WeaponsInventoryArray.Remove(const_cast<ABaseWeapon*>(DeletedBaseWeapon)) != 0);}
+	UFUNCTION()
+	bool RemoveWeaponFromInvAndDestroy(ABaseWeapon* DeletedBaseWeapon);
+	UFUNCTION()
+	bool AddWeaponToInventoryAtIdx(ABaseWeapon const* NewBaseWeapon,int32 Idx); //This add is unique // we need to keep this private since this add is unchecked so we use it internally only
+	
+	bool IsMainWeaponIdx(int32 Idx) const {return (Idx == 0);}
+
+	UFUNCTION()
+	void ResetAllPendingItemActions();
 
 
 public:
@@ -47,15 +65,20 @@ public:
 	UFUNCTION()
 	ABaseWeapon* GetSecondaryWeapon() const{return GetWeaponAt(1);}
 	UFUNCTION()
-	bool AddWeaponToInventoryAtIdx(ABaseWeapon const* NewBaseWeapon,int32 Idx); //This add is unique
-	UFUNCTION()
-	bool AddMainWeaponToInventory(ABaseWeapon const* NewBaseWeapon) {return AddWeaponToInventoryAtIdx(NewBaseWeapon,0);}
+	bool AddMainWeaponToInventory(ABaseWeapon const* NewBaseWeapon);
 	UFUNCTION()
 	bool AddSecondaryWeaponToInventory(ABaseWeapon const* NewBaseWeapon){ return AddWeaponToInventoryAtIdx(NewBaseWeapon,1);}
 	UFUNCTION()
-	bool RemoveWeaponFromInventory(ABaseWeapon const* DeletedBaseWeapon){return (WeaponsInventoryArray.Remove(const_cast<ABaseWeapon*>(DeletedBaseWeapon)) != 0);}
-	UFUNCTION()
 	int32 GetWeaponInventorySize() const{return WeaponsInventoryArray.Num();}
+	UFUNCTION()
+	int32 GetMaxWeaponInventorySize() const {return MaxWeapons;}
+	UFUNCTION()
+	bool HasRemainingInventoryCapacity() const {return (WeaponsInventoryArray.Num() < MaxWeapons);}
+	UFUNCTION()
+	ABaseWeapon* GetLastWeapon() const{return ((WeaponsInventoryArray.Num() > 0) ? WeaponsInventoryArray.Top() : nullptr);}
+	UFUNCTION()
+	bool HasWeaponOfSameTypeInInventory(ABaseWeapon* WeaponToCheck) const;
+
 
 	
 

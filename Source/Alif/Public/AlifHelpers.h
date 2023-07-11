@@ -15,3 +15,5 @@ public:
 
 	static FVector IntersectRayWithPlane(const FVector& RayOrigin, const FVector& RayDirection, const FPlane& Plane);
 };
+
+

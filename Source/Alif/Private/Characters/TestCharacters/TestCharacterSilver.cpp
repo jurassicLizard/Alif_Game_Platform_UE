@@ -2,6 +2,7 @@
 
 
 #include "Characters/TestCharacters/TestCharacterSilver.h"
+#include "AlifLogging.h"
 
 
 
@@ -22,7 +23,7 @@ ATestCharacterSilver::ATestCharacterSilver(const FObjectInitializer& ObjectIniti
         GetMesh()->SetAnimClass(CharacterAnimationHelper.Class);
 	}else
     {
-        UE_LOG(LogTemp, Error, TEXT("We are not properly initializing ItemMesh under %s"), *GetName());
+        UE_LOG(LogAlifDebug, Error, TEXT("We are not properly initializing ItemMesh under %s"), *GetName());
     }
 
     

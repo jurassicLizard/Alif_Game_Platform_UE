@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "Pawns/MainSpectatorPawnMovement.h"
-
+#include "AlifLogging.h"
 #include "Pawns/MainSpectatorPawn.h"
 #include "Controllers/MainPlayerController.h"
 #include "Pawns/MainCameraComponent.h"
@@ -46,7 +46,7 @@ void UMainSpectatorPawnMovement::TickComponent(float DeltaTime, ELevelTick TickT
 
     //     if(SpectatorPawn && SpectatorPawn->GetMainCameraComponent())
     //     {
-    //         UE_LOG(LogTemp, Warning, TEXT("We are clamping"));
+    //         UE_LOG(LogAlifDebug, Warning, TEXT("We are clamping"));
     //         SpectatorPawn->GetMainCameraComponent()->ClampCameraLocation(PlayerController, MyLocation);
     //     } 
     //     UpdatedComponent->SetWorldLocation(MyLocation,false);

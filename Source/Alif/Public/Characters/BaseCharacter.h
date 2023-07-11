@@ -40,6 +40,8 @@ public:
 	bool HasPickupCapability() const{return (PickupCapabilityComp != nullptr);}
 
 
+	friend UPickupCapabilityComponent;
+	friend UInventoryCapabilityComponent;
 	
 	
 };

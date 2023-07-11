@@ -3,9 +3,14 @@
 
 #include "Characters/CapabilityComponents/InventoryCapabilityComponent.h"
 #include "Items/Weapons/BaseWeapon.h"
+#include "Interfaces/PickupCapabilityInterface.h"
+#include "AlifLogging.h"
+
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values for this component's properties
-UInventoryCapabilityComponent::UInventoryCapabilityComponent()
+UInventoryCapabilityComponent::UInventoryCapabilityComponent():
+	ItemPendingStowAwayAction(nullptr)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -37,33 +42,198 @@ void UInventoryCapabilityComponent::TickComponent(float DeltaTime, ELevelTick Ti
 
 bool UInventoryCapabilityComponent::AddWeaponToInventoryAtIdx(ABaseWeapon const* NewBaseWeapon, int32 Idx)
 {
+	//this is a helper function used internally. DO NOT expose this publicly
 	if(!NewBaseWeapon)
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s : Attempting to Add a Null Weapon . this is fatal"),*GetReadableName());
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to Add a Null Weapon or non ABaseWeapon Item . this is fatal"),*GetReadableName());
+		return false;
+	}
+	bool bIsDuplicate = HasWeaponOfSameTypeInInventory(const_cast<ABaseWeapon*>(NewBaseWeapon)); 
+	
+	if(!HasRemainingInventoryCapacity())
+	{
+
+			if(GetLastWeapon()/**FIXME and LastWeapon is Droppable*/)
+			{
+				UE_LOG(LogAlifDebug, Warning, TEXT("%s : Queuing Drop Action for %s"),*GetReadableName(),*GetLastWeapon()->GetName());
+				ItemPendingDropAction = GetLastWeapon();
+			}
+
+
+		// if(!RemoveWeaponFromInvAndDestroy(GetMainWeapon())) //FIXME change this to dropordestroy function depending on state of weapon
+		// {
+		// 	UE_LOG(LogAlifDebug, Error, TEXT("%s : Was unable to remove Main weapon from inventory . this is unexpected, skipping AddMainWeapon operation"),*GetReadableName());
+		// 	return false;
+		// }
+
+	}
+	
+		
+	if(!bIsDuplicate)
+	{
+		if(GetMainWeapon() && IsMainWeaponIdx(Idx))
+		{
+			//if this is a main weapon idx we check for mainweapon existence and hide/drop it if it is there
+			UE_LOG(LogAlifDebug, Warning, TEXT("%s : Queuing Stow away Action for %s"),*GetReadableName(),*GetLastWeapon()->GetName());
+			ItemPendingStowAwayAction = GetMainWeapon();
+		}
+
+		if(ItemPendingStowAwayAction)
+		{
+			if(IPickupCapabilityInterface* OwnerIface = Cast<IPickupCapabilityInterface>(GetOwner()))
+			{				
+				UE_LOG(LogAlifDebug, Warning, TEXT("%s : Delegating Stowing of %s to %s through Stow Item interface"),*GetReadableName(),*NewBaseWeapon->GetName(),*GetOwner()->GetName());
+				OwnerIface->StowItem(ItemPendingStowAwayAction);
+				ItemPendingStowAwayAction = nullptr;
+			}
+		}
+
+		if(ItemPendingDropAction)
+		{
+			if(IPickupCapabilityInterface* OwnerIface = Cast<IPickupCapabilityInterface>(GetOwner()))
+			{				
+				
+				if(RemoveWeaponFromInventory(Cast<ABaseWeapon>(ItemPendingDropAction)))
+				{
+					UE_LOG(LogAlifDebug, Warning, TEXT("%s : Delegating Dropping of %s to %s through Drop Item interface"),*GetReadableName(),*NewBaseWeapon->GetName(),*GetOwner()->GetName());
+					OwnerIface->DropItem(ItemPendingDropAction);
+					ItemPendingDropAction = nullptr;
+
+				} //we need to pack this line and the next in a utility FUnction to avoid making mistakes
+
+			}
+
+		}
+		//FIX ME CONDUCT A SECOND INVENTORY CHECK HERE
+		WeaponsInventoryArray.Insert(const_cast<ABaseWeapon*>(NewBaseWeapon),Idx);
+		if (GEngine)
+		{
+			
+			for(int i = 0; i< GetWeaponInventorySize() ; i++)
+			{
+				FString MsgString = (GetWeaponAt(i) ? GetWeaponAt(i)->GetName() : "None");
+				GEngine->AddOnScreenDebugMessage((4 + i),10,FColor::Red,FString::Printf(TEXT("Weapon at %d : %s"),i,*MsgString));
+
+			}
+		}
+
+		return true;
+
+	}else
+	{
+		UE_LOG(LogAlifDebug, Warning, TEXT("%s : Found Duplicate Item for %s . resetting and aborting"),*GetReadableName(),*NewBaseWeapon->GetName());
+		ResetAllPendingItemActions(); //we reset pending actions since we are not adding anything
+	}
+
+	
+
+
+	ResetAllPendingItemActions(); //we reset all pending actions in case something slipped due to unknown error
+    return false;
+}
+
+bool UInventoryCapabilityComponent::AddMainWeaponToInventory(ABaseWeapon const* NewBaseWeapon) 
+{
+	if(!NewBaseWeapon)
+	{
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to pick an  null pointer. aborting.  there is something wrong with the api this shouldnot happen."),*GetReadableName());
 		return false;
 	}
 
-	bool IsDuplicate = (WeaponsInventoryArray.Find(const_cast<ABaseWeapon*>(NewBaseWeapon)) > 0);
-
-	if(!IsDuplicate)
+	if(!NewBaseWeapon->HasPickableCapability()) //TODO Add EquipabaleCapability or make pickablecapability handle isEquipable and iSdroppable
 	{
-		WeaponsInventoryArray.Insert(const_cast<ABaseWeapon*>(NewBaseWeapon),Idx);
-
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to pick an item with no pickable capability . aborting.  there is something wrong with the api this shouldnot happen."),*GetReadableName());
+		return false;
 	}
-    return !IsDuplicate;
+
+
+	if(AddWeaponToInventoryAtIdx(NewBaseWeapon,0))
+	{
+		if(IPickupCapabilityInterface* OwnerIface = Cast<IPickupCapabilityInterface>(GetOwner()))
+		{	
+			//AddWeaponToInventoryAtIDx already checks if the weapon is inserted as a main weapon and handles Hiding it
+			UE_LOG(LogAlifDebug, Warning, TEXT("%s : Delegating Pickup of %s to %s through Pickup interface"),*GetReadableName(),*NewBaseWeapon->GetName(),*GetOwner()->GetName());
+			OwnerIface->PickUpItem(NewBaseWeapon);
+			
+			return true;
+
+		}
+	}
+
+	return false;
+
 }
+
+
+bool UInventoryCapabilityComponent::RemoveWeaponFromInvAndDestroy(ABaseWeapon* DeletedBaseWeapon)
+{
+	if(DeletedBaseWeapon)
+	{
+		 UE_LOG(LogAlifDebug, Warning, TEXT("%s : Attempting to Destroy %s"),*GetReadableName(),*DeletedBaseWeapon->GetName());
+		 return RemoveWeaponFromInventory(DeletedBaseWeapon) && DeletedBaseWeapon->Destroy();	 
+
+
+	}else
+	{
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to remove nullptr this is not good"),*GetReadableName());
+	}
+
+	return false;
+	
+}
+
+
+
 
 
 ABaseWeapon* UInventoryCapabilityComponent::GetWeaponAt(int32 Idx) const
 {
 	if(WeaponsInventoryArray.IsValidIndex(Idx) && WeaponsInventoryArray[Idx])
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s : Attempting to return Weapon with Name %s"),*GetReadableName(),*WeaponsInventoryArray[Idx]->GetName());
+		UE_LOG(LogAlifDebug, Warning, TEXT("%s : Attempting to retrieve Weapon with Name %s"),*GetReadableName(),*WeaponsInventoryArray[Idx]->GetName());
 		return WeaponsInventoryArray[Idx];
 	}else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s : Attempting to access Weapon inventory at %d but nothing here"),*GetReadableName(),Idx);
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to access Weapon inventory at %d but nothing here"),*GetReadableName(),Idx);
 		return nullptr;
 	}
+
+}
+
+
+void UInventoryCapabilityComponent::ResetAllPendingItemActions()
+{
+	ItemPendingDropAction = nullptr;
+	ItemPendingStowAwayAction = nullptr;
+}
+
+
+bool UInventoryCapabilityComponent::HasWeaponOfSameTypeInInventory(ABaseWeapon* WeaponToCheck) const
+{
+	if(!WeaponToCheck)
+	{
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Passing a null pointer to check its existance . this is not good . check api"),*GetReadableName());
+		return false;
+	}
+	for(ABaseWeapon* CurWeapon : WeaponsInventoryArray)
+	{
+		if(!CurWeapon)
+		{
+			UE_LOG(LogAlifDebug, Error, TEXT("%s : Checking against Nullpointer in inventory .Meaning inventory has not been properly sanitized. this is not good . check api"),*GetReadableName());
+			return false;
+		}
+
+		//retrieve the Class Default Object for both comparabales to check if they are of the same type . THank you KISMET xD
+		UObject* WeaponToCheckCDO = WeaponToCheck->GetClass()->GetDefaultObject(false);
+		UObject* WeaponToCompareCDO = CurWeapon->GetClass()->GetDefaultObject(false);
+
+		if(UKismetMathLibrary::EqualEqual_ObjectObject(WeaponToCheckCDO,WeaponToCompareCDO))
+		{
+			UE_LOG(LogAlifDebug, Display, TEXT("%s : Found Objects of same type %s and %s"),*GetReadableName(),*WeaponToCheck->GetName(),*CurWeapon->GetName());
+			return true;
+		}
+	}
+
+	return false;
 
 }

@@ -2,7 +2,7 @@
 
 
 #include "Items/Weapons/Rifles/PrototypeCannon.h"
-
+#include "AlifLogging.h"
 #include "Components/CapsuleComponent.h"
 #include "Items/ItemComponents/FloatingPickableComponent.h"
 
@@ -18,7 +18,7 @@ APrototypeCannon::APrototypeCannon()
 		GetItemMesh()->SetSkeletalMesh(WeaponSkeletalMeshHelper.Object);
 	}else
     {
-        UE_LOG(LogTemp, Error, TEXT("We are not properly initializing ItemMesh under %s"), *GetName());
+        UE_LOG(LogAlifDebug, Error, TEXT("We are not properly initializing ItemMesh under %s"), *GetName());
     }
 
     FloatingPickableComponent = CreateDefaultSubobject<UFloatingPickableComponent>("Floating Idle Pickable Component");

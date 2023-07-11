@@ -13,8 +13,7 @@ UENUM()
 enum class EPickedState : uint8
 {
 	DROPPED,
-	PICKED,
-	MAX
+	PICKED
 };
 
 
@@ -52,7 +51,6 @@ private:
 	FVector CapsuleWorldLocationOffset;
 	UPROPERTY()
 	EPickedState PickedState;
-
 	
 
 
@@ -70,11 +68,12 @@ protected:
 	void AddCapsuleWorldLocationOffset(FVector WorldLocationOffset = FVector(0.f,25.f,10.f));
 	void SetPickableCapsuleHalfHeight(float HalfHeight = 44.f);
 	void SetPickableCapsuleRadius(float Radius = 18.f);
-
+	//TODO the following should be a pure virtual on a future parent class that encapsulates all pickablecomponent styles (floating , static , etc..)
+	void HandleDroppedState(float DeltaTime);
 
 public:
 	EPickedState& GetPickedState() {return PickedState;};
-	void SetPickedState(EPickedState const& NewPickedState) { PickedState = NewPickedState;}
+	void SetPickedState(EPickedState const& NewPickedState);
 
 
 

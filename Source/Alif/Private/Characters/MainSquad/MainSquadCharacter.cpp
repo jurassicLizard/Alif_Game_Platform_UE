@@ -2,6 +2,7 @@
 
 
 #include "Characters/MainSquad/MainSquadCharacter.h"
+#include "AlifLogging.h"
 #include "Components/CapsuleComponent.h"
 #include "AIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -15,7 +16,9 @@
 
 
 AMainSquadCharacter::AMainSquadCharacter(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+	Super(ObjectInitializer),
+	WeaponMainSocketName(TEXT("WeaponRSocket")),
+	BackpackSocketName(TEXT("BackpackWeaponSocket"))
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -33,7 +36,7 @@ AMainSquadCharacter::AMainSquadCharacter(const FObjectInitializer& ObjectInitial
 
 	}else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s : Getting a null pointer instead of our capsule component, something really terrible is happening here"),*GetName());
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Getting a null pointer instead of our capsule component, something really terrible is happening here"),*GetName());
 	}
 
 
@@ -62,14 +65,14 @@ void AMainSquadCharacter::BeginPlay()
 	//temporary code specific to wraith character
 	if(!IsActorTickEnabled()) 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s : is NOT alive and ticking "),*GetName());
+		UE_LOG(LogAlifDebug, Warning, TEXT("%s : is NOT alive and ticking "),*GetName());
 	}
 
 	if(USkeletalMeshComponent* CharMesh = GetMesh())
 	{
 		if(!GetWorld()) 
 		{
-			UE_LOG(LogTemp, Error, TEXT("Something terrible has happend the world hasnot be created yet : %s"),*GetName());
+			UE_LOG(LogAlifDebug, Error, TEXT("Something terrible has happend the world hasnot be created yet : %s"),*GetName());
 			return;
 		}
 
@@ -80,31 +83,17 @@ void AMainSquadCharacter::BeginPlay()
 
 		if(HasInventoryCapability())
 		{
-					UE_LOG(LogTemp, Warning, TEXT("Has Inventory Attempting to populate : %s"),*GetName());
-					bool bSuccessAdd = GetInventoryCapabilityComponent()->AddMainWeaponToInventory(GetWorld()->SpawnActor<APrototypeRifle>(APrototypeRifle::StaticClass()));
+					UE_LOG(LogAlifDebug, Warning, TEXT("Has Inventory Attempting to populate Initial Inventory for : %s"),*GetName());
 
-					if(bSuccessAdd)
+					if(!GetInventoryCapabilityComponent()->AddMainWeaponToInventory(GetWorld()->SpawnActor<APrototypeRifle>(APrototypeRifle::StaticClass())))
 					{
-							
-						TWeakObjectPtr<ABaseWeapon> MainWeaponObj = GetInventoryCapabilityComponent()->GetMainWeapon();
-
-						if(MainWeaponObj.IsValid())
-						{
-							MainWeaponObj->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform,TEXT("WeaponRSocket"));
-						}else
-						{
-							UE_LOG(LogTemp, Error, TEXT("We have a null pointer mesh at %s"),*GetName());
-							UE_LOG(LogTemp, Error, TEXT("%s : Current Weapon inventory size is %d"),*GetName(),GetInventoryCapabilityComponent()->GetWeaponInventorySize())
-						}
-					}else
-					{
-						UE_LOG(LogTemp, Error, TEXT("%s : Failed to Add Main Weapon"));
+						UE_LOG(LogAlifDebug, Error, TEXT("%s : Failed to Add Main Weapon"),*GetName());
 					}
 
 
 		}else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s : Has no Inventory"),*GetName());
+			UE_LOG(LogAlifDebug, Warning, TEXT("%s : Has no Inventory"),*GetName());
 		}
 
 		
@@ -112,7 +101,7 @@ void AMainSquadCharacter::BeginPlay()
 
 	}else
 	{
-		UE_LOG(LogTemp, Error, TEXT("We have a null pointer mesh at %s"),*GetName());
+		UE_LOG(LogAlifDebug, Error, TEXT("We have a null pointer mesh at %s"),*GetName());
 	}
 	//end temporary code
 }
@@ -151,12 +140,12 @@ void AMainSquadCharacter::Tick(float DeltaTime)
 //Interface Implementation
 void AMainSquadCharacter::OnSelectionGained()
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s reports being selected"),*GetName());
+	UE_LOG(LogAlifDebug, Warning, TEXT("%s reports being selected"),*GetName());
 }
 
 void AMainSquadCharacter::OnPrimaryActionTrigger(FVector NewLocation)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s reports attempting to move"),*GetName());
+	UE_LOG(LogAlifDebug, Warning, TEXT("%s reports attempting to move"),*GetName());
 
 	//TODO make sure AIController is always Created
 
@@ -165,7 +154,7 @@ void AMainSquadCharacter::OnPrimaryActionTrigger(FVector NewLocation)
 		Controller->MoveToLocation(NewLocation);
 	}else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s has no AI Controller and cannot be controlled , this is fatal"),*GetName());
+		UE_LOG(LogAlifDebug, Error, TEXT("%s has no AI Controller and cannot be controlled , this is fatal"),*GetName());
 	}
 
 
@@ -190,7 +179,7 @@ void AMainSquadCharacter::OnTriggeredPickupCmd(const ABaseItem* PickedUpActorCan
 
 	}else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s : Implementing PickupCapabilityInterface but having no PickupCapabilityCOmponent is not possible . this is FATAL"),*GetName());
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Implementing PickupCapabilityInterface but having no PickupCapabilityCOmponent is not possible . this is FATAL"),*GetName());
 	}
 
 }
@@ -201,7 +190,7 @@ void AMainSquadCharacter::OnCancelledPickupCmd()
 		PickupCapabilityComp->CancelPickupCommand();
 	}else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s : Implementing PickupCapabilityInterface but having no PickupCapabilityCOmponent is not possible . this is FATAL"),*GetName());
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Implementing PickupCapabilityInterface but having no PickupCapabilityCOmponent is not possible . this is FATAL"),*GetName());
 	}
 
 }
@@ -220,5 +209,79 @@ bool AMainSquadCharacter::IsMoving()
 bool AMainSquadCharacter::CanQueryMoveState()
 {
 	return Cast<AAIController>(GetController());
+}
+
+
+void AMainSquadCharacter::PickUpItem(const ABaseItem* ItemToPickUp)
+{
+	//WARNING this interface implementation is called by the pickup capability component and should not be called explicitly to avoid recursions
+
+	ABaseItem* ItemPtr = const_cast<ABaseItem*>(ItemToPickUp);
+	if(ABaseWeapon* Weapon = Cast<ABaseWeapon>(ItemPtr))
+	{
+
+		//hiding and handling currently held weapon is handled by the pickup component
+		UE_LOG(LogAlifDebug, Display, TEXT("%s : Attempting to Attach to Weapon Socket %s"),*GetName(),*Weapon->GetName());
+		FString IsHiddenStr = (Weapon->IsHidden() ? "true" : "false");
+		UE_LOG(LogAlifDebug, Display, TEXT("%s : Weapon Hidden state for %s is %s"),*GetName(),*Weapon->GetName(),*IsHiddenStr);
+
+		
+		Weapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,WeaponMainSocketName);
+
+
+
+
+		
+	}else
+	{
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to pick up something that is not pickable or is a null pointer , this is not good"),*GetName())
+		//else if ABaseCannon ? etc.etc.etc.
+	}
+}
+
+void AMainSquadCharacter::DropItem(const ABaseItem* ItemToDrop)
+{
+	//WARNING this interface implementation is called by the pickup capability component and should not be called explicitly to avoid recursions
+
+	ABaseItem* ItemPtr = const_cast<ABaseItem*>(ItemToDrop);
+	if(ABaseWeapon* Weapon = Cast<ABaseWeapon>(ItemPtr))
+	{
+
+		//hiding and handling currently held weapon is handled by the pickup component
+		UE_LOG(LogAlifDebug, Display, TEXT("%s : Attempting to Drop to Weapon %s"),*GetName(),*Weapon->GetName());
+		FString IsHiddenStr = (Weapon->IsHidden() ? "true" : "false");
+		UE_LOG(LogAlifDebug, Display, TEXT("%s : Weapon Hidden state for %s is %s"),*GetName(),*Weapon->GetName(),*IsHiddenStr);
+
+		Weapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		
+	}else
+	{
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to pick up something that is not droppable or is a null pointer , this is not good"),*GetName())
+		//else if ABaseCannon ? etc.etc.etc.
+	}
+}
+
+
+void AMainSquadCharacter::StowItem(const ABaseItem* ItemToStow)
+{
+	//WARNING this interface implementation is called by the pickup capability component and should not be called explicitly to avoid recursions
+
+	ABaseItem* ItemPtr = const_cast<ABaseItem*>(ItemToStow);
+	if(ABaseWeapon* Weapon = Cast<ABaseWeapon>(ItemPtr))
+	{
+
+		//hiding and handling currently held weapon is handled by the pickup component
+		UE_LOG(LogAlifDebug, Display, TEXT("%s : Attempting to Stow Weapon %s"),*GetName(),*Weapon->GetName());
+		FString IsHiddenStr = (Weapon->IsHidden() ? "true" : "false");
+		UE_LOG(LogAlifDebug, Display, TEXT("%s : Weapon Hidden state for %s is %s"),*GetName(),*Weapon->GetName(),*IsHiddenStr);
+		
+		Weapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,BackpackSocketName);//FIXME BaseItem should have FUnction to get default Transform fro mDefault CDO as wel as "stow" transform
+
+
+	}else
+	{
+		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to pick up something that is not stowable or is a null pointer , this is not good"),*GetName())
+		//else if ABaseCannon ? etc.etc.etc.
+	}
 }
 //End Interface Implementation

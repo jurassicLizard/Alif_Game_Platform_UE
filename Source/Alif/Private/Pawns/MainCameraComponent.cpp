@@ -2,6 +2,7 @@
 
 
 #include "Pawns/MainCameraComponent.h"
+#include "AlifLogging.h"
 #include "Pawns/MainSpectatorPawn.h"
 #include "Pawns/MainSpectatorPawnMovement.h"
 #include "AlifHelpers.h"
@@ -159,7 +160,7 @@ void UMainCameraComponent::UpdateCameraMovement( const APlayerController* InPlay
     */
     if(InPlayerController == nullptr)
     {
-        UE_LOG(LogTemp, Error, TEXT("Trying to pass a NULL Player controller to %s"),*GetName());
+        UE_LOG(LogAlifDebug, Error, TEXT("Trying to pass a NULL Player controller to %s"),*GetName());
         return;
     }
 
