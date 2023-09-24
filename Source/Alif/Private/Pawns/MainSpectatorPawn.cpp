@@ -5,7 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h" 
-
+#include "Characters/CapabilityComponents/InventoryCapabilityComponent.h"
 
 #include "Pawns/MainSpectatorPawnMovement.h"
 #include "Pawns/MainCameraComponent.h"
@@ -15,14 +15,8 @@
 #include "EnhancedInput/ZoomAction.h"
 #include "EnhancedInput/SelectAction.h"
 #include "EnhancedInput/ReleaseAction.h"
-
-
-
-
-
-
-
-
+#include "EnhancedInput/SwitchWeaponAction.h"
+#include "Interfaces/InventoryCapabilityInterface.h"
 
 
 AMainSpectatorPawn::AMainSpectatorPawn(const FObjectInitializer& ObjectInitializer)
@@ -44,6 +38,7 @@ AMainSpectatorPawn::AMainSpectatorPawn(const FObjectInitializer& ObjectInitializ
         ZoomAction    = StandardPlayMappingContext->GetZoomAction();
         SelectAction  = StandardPlayMappingContext->GetSelectAction();
         ReleaseAction = StandardPlayMappingContext->GetReleaseAction();
+        SwitchWeaponAction = StandardPlayMappingContext->GetSwitchWeaponAction();
     }
 
 }
@@ -91,6 +86,11 @@ void AMainSpectatorPawn::SetupPlayerInputComponent(UInputComponent *InputCompone
         UE_LOG(LogAlifDebug, Error, TEXT("We Cannot use any selection or release options. this is fatal"));
     }
 
+    if(SwitchWeaponAction == nullptr)
+    {
+        UE_LOG(LogAlifDebug,Fatal, TEXT("We cannot switch weapons , this is fatal"));
+    }
+
  
 
     if(UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
@@ -99,6 +99,7 @@ void AMainSpectatorPawn::SetupPlayerInputComponent(UInputComponent *InputCompone
         EnhancedInputComponent->BindAction(ZoomAction,ETriggerEvent::Triggered,this,&AMainSpectatorPawn::TriggerZoom);
         EnhancedInputComponent->BindAction(SelectAction,ETriggerEvent::Triggered,this,&AMainSpectatorPawn::OnMouseLeft);
         EnhancedInputComponent->BindAction(ReleaseAction,ETriggerEvent::Triggered,this,&AMainSpectatorPawn::OnMouseRight);
+        EnhancedInputComponent->BindAction(SwitchWeaponAction,ETriggerEvent::Triggered,this,&AMainSpectatorPawn::OnSwitchWeapon);
         
     }
 
@@ -181,6 +182,27 @@ void AMainSpectatorPawn::OnMouseScrollDown()
         MainCameraComponent->TriggerZoomOut();
     }
 }
+
+void AMainSpectatorPawn::OnSwitchWeapon()
+{
+    if(const AMainPlayerController* PlayerController = Cast<AMainPlayerController>(GetController()))
+    {
+        if(AActor* SelectedActor = PlayerController->GetCurSelectedActor().Get())
+        {
+            //get selected actor inventory and call switch method
+            if(SelectedActor->GetClass()->ImplementsInterface(UInventoryCapabilityInterface::StaticClass()))
+            {
+                UE_LOG(LogAlifDebug,Display,TEXT("Attempting to Switch Weapon for %s"),*SelectedActor->GetName());
+                IInventoryCapabilityInterface* SelectedActorInvIface = Cast<IInventoryCapabilityInterface>(SelectedActor);
+                SelectedActorInvIface->SwitchToNextWeapon(); //FIXME this is wrong we should call InitiateSwitchToNextWeapon and rename SwitchToNextWeapon to OnSwitchToNextWeapon
+                
+            }
+            //call switch on actor inventory
+            
+        }
+    }
+}
+
 
 UMainCameraComponent *AMainSpectatorPawn::GetMainCameraComponent()
 {

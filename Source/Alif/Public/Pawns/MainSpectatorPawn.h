@@ -41,11 +41,15 @@ private:
 	class USelectAction* SelectAction;
 	UPROPERTY()
 	class UReleaseAction* ReleaseAction;
+	UPROPERTY()
+	class USwitchWeaponAction* SwitchWeaponAction;
 
 	/** Handles the mouse scrolling up*/
 	void OnMouseScrollUp();
 	/** Handles the mouse scrolling down*/
 	void OnMouseScrollDown();
+	/** Handles the switch weapon action**/
+	void OnSwitchWeapon();
 
 
 

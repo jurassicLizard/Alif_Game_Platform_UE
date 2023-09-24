@@ -13,6 +13,8 @@ class ULookAction;
 class UZoomAction;
 class USelectAction;
 class UReleaseAction;
+class USwitchWeaponAction;
+
 
 UCLASS()
 class ALIF_API UStdInputMappingContext : public UInputMappingContext
@@ -28,10 +30,16 @@ public:
 
 private:
 
+	UPROPERTY()
     const ULookAction* LookAction;
-    const UZoomAction* ZoomAction;
-    const USelectAction* SelectAction;
-    const UReleaseAction* ReleaseAction;
+	UPROPERTY()
+	const UZoomAction* ZoomAction;
+	UPROPERTY()
+	const USelectAction* SelectAction;
+	UPROPERTY()
+	const UReleaseAction* ReleaseAction;
+	UPROPERTY()
+	const USwitchWeaponAction* SwitchWeaponAction;
 
 
 
@@ -49,6 +57,8 @@ public:
 	USelectAction*  GetSelectAction() const {return const_cast<USelectAction*>(SelectAction);};
 	UFUNCTION()
 	UReleaseAction*  GetReleaseAction() const {return const_cast<UReleaseAction*>(ReleaseAction);};
+	UFUNCTION()
+	USwitchWeaponAction* GetSwitchWeaponAction() const{return const_cast<USwitchWeaponAction*>(SwitchWeaponAction);}
 	
 	
 	

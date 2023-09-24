@@ -27,7 +27,7 @@ class ALIF_API AMainPlayerController : public APlayerController
 
 public:
 	/**Begin Class Interface*/
-	AMainPlayerController();
+	AMainPlayerController(const FObjectInitializer& ObjectInitializer);
 	/**End Class Interface*/
 
 //begin AController interface
@@ -67,7 +67,9 @@ public:
 	//Begin Actor Selections Markers
 	UFUNCTION()
 	TWeakObjectPtr<AActor> GetCurSelectedActor() const {return CurSelectedActor;};
+	UFUNCTION()
 	void SetCurSelectedActor(AActor* const NewActor);
+	UFUNCTION()
 	void ClearActorSelection(){CurSelectedActor = nullptr;};
 	bool IsActorSelected() const {return (CurSelectedActor != nullptr);}
 

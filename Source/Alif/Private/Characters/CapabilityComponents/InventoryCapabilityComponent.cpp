@@ -1,10 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+//FIXME change this entire class to something more efficient this is a crappy class . instead of juggling around pointers in arrays . just have an array and juggle around indices
+//FIXME an idea is to use MAP<weapon,idx> where we just change the idx of a wapon based on where it is now
+//FIXME check if this is actually better first before making any changes here. dont fix what is not broken
 
 #include "Characters/CapabilityComponents/InventoryCapabilityComponent.h"
 #include "Items/Weapons/BaseWeapon.h"
 #include "Interfaces/PickupCapabilityInterface.h"
 #include "AlifLogging.h"
+#include "Interfaces/InventoryCapabilityInterface.h"
 
 #include "Kismet/KismetMathLibrary.h"
 
@@ -16,8 +20,6 @@ UInventoryCapabilityComponent::UInventoryCapabilityComponent():
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-
-	// ...
 }
 
 
@@ -48,7 +50,7 @@ bool UInventoryCapabilityComponent::AddWeaponToInventoryAtIdx(ABaseWeapon const*
 		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to Add a Null Weapon or non ABaseWeapon Item . this is fatal"),*GetReadableName());
 		return false;
 	}
-	bool bIsDuplicate = HasWeaponOfSameTypeInInventory(const_cast<ABaseWeapon*>(NewBaseWeapon)); 
+	const bool bIsDuplicate = HasWeaponOfSameTypeInInventory(const_cast<ABaseWeapon*>(NewBaseWeapon)); 
 	
 	if(!HasRemainingInventoryCapacity())
 	{
@@ -83,7 +85,7 @@ bool UInventoryCapabilityComponent::AddWeaponToInventoryAtIdx(ABaseWeapon const*
 			if(IPickupCapabilityInterface* OwnerIface = Cast<IPickupCapabilityInterface>(GetOwner()))
 			{				
 				UE_LOG(LogAlifDebug, Warning, TEXT("%s : Delegating Stowing of %s to %s through Stow Item interface"),*GetReadableName(),*NewBaseWeapon->GetName(),*GetOwner()->GetName());
-				OwnerIface->StowItem(ItemPendingStowAwayAction);
+				OwnerIface->OnStowItem(ItemPendingStowAwayAction);
 				ItemPendingStowAwayAction = nullptr;
 			}
 		}
@@ -96,7 +98,7 @@ bool UInventoryCapabilityComponent::AddWeaponToInventoryAtIdx(ABaseWeapon const*
 				if(RemoveWeaponFromInventory(Cast<ABaseWeapon>(ItemPendingDropAction)))
 				{
 					UE_LOG(LogAlifDebug, Warning, TEXT("%s : Delegating Dropping of %s to %s through Drop Item interface"),*GetReadableName(),*NewBaseWeapon->GetName(),*GetOwner()->GetName());
-					OwnerIface->DropItem(ItemPendingDropAction);
+					OwnerIface->OnDropItem(ItemPendingDropAction);
 					ItemPendingDropAction = nullptr;
 
 				} //we need to pack this line and the next in a utility FUnction to avoid making mistakes
@@ -153,7 +155,7 @@ bool UInventoryCapabilityComponent::AddMainWeaponToInventory(ABaseWeapon const* 
 		{	
 			//AddWeaponToInventoryAtIDx already checks if the weapon is inserted as a main weapon and handles Hiding it
 			UE_LOG(LogAlifDebug, Warning, TEXT("%s : Delegating Pickup of %s to %s through Pickup interface"),*GetReadableName(),*NewBaseWeapon->GetName(),*GetOwner()->GetName());
-			OwnerIface->PickUpItem(NewBaseWeapon);
+			OwnerIface->OnPickUpItem(NewBaseWeapon);
 			
 			return true;
 
@@ -215,7 +217,7 @@ bool UInventoryCapabilityComponent::HasWeaponOfSameTypeInInventory(ABaseWeapon* 
 		UE_LOG(LogAlifDebug, Error, TEXT("%s : Passing a null pointer to check its existance . this is not good . check api"),*GetReadableName());
 		return false;
 	}
-	for(ABaseWeapon* CurWeapon : WeaponsInventoryArray)
+	for(const ABaseWeapon* CurWeapon : WeaponsInventoryArray)
 	{
 		if(!CurWeapon)
 		{
@@ -237,3 +239,38 @@ bool UInventoryCapabilityComponent::HasWeaponOfSameTypeInInventory(ABaseWeapon* 
 	return false;
 
 }
+
+
+bool UInventoryCapabilityComponent::SwitchToNextWeapon()
+{
+	if(GetWeaponInventorySize()> 1)
+	{
+		// conduct switch of weapon and call interface function of switch which would be implemented by the actor
+		if(IInventoryCapabilityInterface* OwningActorIface = Cast<IInventoryCapabilityInterface>(GetOwner()))
+		{
+			OwningActorIface->SwitchToNextWeapon();
+			
+		}
+		else
+		{
+			UE_LOG(LogAlifDebug,Error,TEXT("Incapable of switching weapon , something really terrible happened , %s has no owner"),*GetName());
+		}
+	}
+	
+
+
+	return false;
+}
+
+uint8 UInventoryCapabilityComponent::GetMaxWeaponInventorySize() const
+{
+	if(IInventoryCapabilityInterface* OwningActorIface = Cast<IInventoryCapabilityInterface>(GetOwner()) )
+	{
+		return OwningActorIface->GetMaxWeapons();
+	}
+
+	UE_LOG(LogAlifDebug,Error,TEXT("Was Unable to find Owner for the component : %s : This is fatal"),*GetName());
+	return 0;
+}
+bool UInventoryCapabilityComponent::HasRemainingInventoryCapacity() const {return (WeaponsInventoryArray.Num() < GetMaxWeaponInventorySize());}
+

@@ -31,9 +31,9 @@ public:
 	virtual bool CanQueryMoveState() {return false;}
 	virtual bool IsMoving() = 0;
 
-	virtual void PickUpItem(const ABaseItem* ItemToPickUp) = 0;
-	virtual void DropItem(const ABaseItem* ItemToDrop) = 0;
-	virtual void StowItem(const ABaseItem* ItemToStow) = 0;
+	virtual void OnPickUpItem(const ABaseItem* ItemToPickUp) = 0;
+	virtual void OnDropItem(const ABaseItem* ItemToDrop) = 0;
+	virtual void OnStowItem(const ABaseItem* ItemToStow) = 0;
 	
 	
 };

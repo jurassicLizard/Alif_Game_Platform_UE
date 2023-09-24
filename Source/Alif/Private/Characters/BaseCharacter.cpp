@@ -23,6 +23,7 @@ ABaseCharacter::ABaseCharacter(const FObjectInitializer& ObjectInitializer):
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false; //strategy top down game
+	
 
 	//Set MovementSettings
 	if(GetCharacterMovement())

@@ -6,13 +6,13 @@
 #include "EnhancedInput/ZoomAction.h"
 #include "EnhancedInput/SelectAction.h"
 #include "EnhancedInput/ReleaseAction.h"
+#include "EnhancedInput/SwitchWeaponAction.h"
 
 
 
 
 
 #include "InputCoreTypes.h" 
-#include "EnhancedActionKeyMapping.h"
 
 UStdInputMappingContext::UStdInputMappingContext()
 {
@@ -20,6 +20,7 @@ UStdInputMappingContext::UStdInputMappingContext()
     ZoomAction = GetDefault<UZoomAction>();
     SelectAction = GetDefault<USelectAction>();
     ReleaseAction = GetDefault<UReleaseAction>();
+    SwitchWeaponAction = GetDefault<USwitchWeaponAction>();
 
     /**Or maybe use StaticClass() like ULookAction::StaticClass() 
      * 
@@ -27,7 +28,6 @@ UStdInputMappingContext::UStdInputMappingContext()
      * of object used in conjunction with the editor world usually
     */
 
-    // FKey LookKey(EKeys::NAME_KeyboardCategory);
     if(LookAction)
     {
         MapKey(LookAction,FKey(EKeys::Mouse2D));
@@ -46,6 +46,11 @@ UStdInputMappingContext::UStdInputMappingContext()
     if(ReleaseAction)
     {
         MapKey(ReleaseAction,FKey(EKeys::RightMouseButton));
+    }
+
+    if(SwitchWeaponAction)
+    {
+        MapKey(SwitchWeaponAction,FKey(EKeys::SpaceBar));
     }
 
 }

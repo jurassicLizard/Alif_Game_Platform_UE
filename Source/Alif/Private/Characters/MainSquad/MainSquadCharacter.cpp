@@ -212,7 +212,7 @@ bool AMainSquadCharacter::CanQueryMoveState()
 }
 
 
-void AMainSquadCharacter::PickUpItem(const ABaseItem* ItemToPickUp)
+void AMainSquadCharacter::OnPickUpItem(const ABaseItem* ItemToPickUp)
 {
 	//WARNING this interface implementation is called by the pickup capability component and should not be called explicitly to avoid recursions
 
@@ -227,10 +227,6 @@ void AMainSquadCharacter::PickUpItem(const ABaseItem* ItemToPickUp)
 
 		
 		Weapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,WeaponMainSocketName);
-
-
-
-
 		
 	}else
 	{
@@ -239,7 +235,7 @@ void AMainSquadCharacter::PickUpItem(const ABaseItem* ItemToPickUp)
 	}
 }
 
-void AMainSquadCharacter::DropItem(const ABaseItem* ItemToDrop)
+void AMainSquadCharacter::OnDropItem(const ABaseItem* ItemToDrop)
 {
 	//WARNING this interface implementation is called by the pickup capability component and should not be called explicitly to avoid recursions
 
@@ -262,7 +258,7 @@ void AMainSquadCharacter::DropItem(const ABaseItem* ItemToDrop)
 }
 
 
-void AMainSquadCharacter::StowItem(const ABaseItem* ItemToStow)
+void AMainSquadCharacter::OnStowItem(const ABaseItem* ItemToStow)
 {
 	//WARNING this interface implementation is called by the pickup capability component and should not be called explicitly to avoid recursions
 
@@ -272,7 +268,7 @@ void AMainSquadCharacter::StowItem(const ABaseItem* ItemToStow)
 
 		//hiding and handling currently held weapon is handled by the pickup component
 		UE_LOG(LogAlifDebug, Display, TEXT("%s : Attempting to Stow Weapon %s"),*GetName(),*Weapon->GetName());
-		FString IsHiddenStr = (Weapon->IsHidden() ? "true" : "false");
+		const FString IsHiddenStr = (Weapon->IsHidden() ? "true" : "false");
 		UE_LOG(LogAlifDebug, Display, TEXT("%s : Weapon Hidden state for %s is %s"),*GetName(),*Weapon->GetName(),*IsHiddenStr);
 		
 		Weapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,BackpackSocketName);//FIXME BaseItem should have FUnction to get default Transform fro mDefault CDO as wel as "stow" transform
@@ -283,5 +279,11 @@ void AMainSquadCharacter::StowItem(const ABaseItem* ItemToStow)
 		UE_LOG(LogAlifDebug, Error, TEXT("%s : Attempting to pick up something that is not stowable or is a null pointer , this is not good"),*GetName())
 		//else if ABaseCannon ? etc.etc.etc.
 	}
+}
+
+void AMainSquadCharacter::SwitchToNextWeapon()
+{
+	//do something
+	UE_LOG(LogAlifDebug,Warning,TEXT("Attempting to switch weapon for %s"),*GetName());
 }
 //End Interface Implementation

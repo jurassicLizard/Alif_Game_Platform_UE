@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
+#include "Interfaces/InventoryCapabilityInterface.h"
 #include "Interfaces/SelectableActorInterface.h"
 #include "Interfaces/PickupCapabilityInterface.h"
 
@@ -16,7 +17,7 @@
 class ABaseItem;
 
 UCLASS()
-class ALIF_API AMainSquadCharacter : public ABaseCharacter, public ISelectableActorInterface, public IPickupCapabilityInterface
+class ALIF_API AMainSquadCharacter : public ABaseCharacter, public ISelectableActorInterface, public IPickupCapabilityInterface, public IInventoryCapabilityInterface
 {
 	GENERATED_BODY()
 
@@ -51,11 +52,17 @@ protected:
 	virtual bool CanQueryMoveState() override;
 	virtual bool IsMoving() override;
 	UFUNCTION()
-	virtual void PickUpItem(const ABaseItem* ItemToPickUp) override;
+	virtual void OnPickUpItem(const ABaseItem* ItemToPickUp) override;
 	UFUNCTION()
-	virtual void DropItem(const ABaseItem* ItemToDrop) override;
+	virtual void OnDropItem(const ABaseItem* ItemToDrop) override;
 	UFUNCTION()
-	virtual void StowItem(const ABaseItem* ItemToStow) override;
+	virtual void OnStowItem(const ABaseItem* ItemToStow) override;
+	UFUNCTION()
+	virtual void SwitchToNextWeapon() override;
+	//FIXME add initiate Pickup item , initiate stow item maybe ??
+
+public:
+	virtual uint8 GetMaxWeapons() override { return 2;}
 
 
 

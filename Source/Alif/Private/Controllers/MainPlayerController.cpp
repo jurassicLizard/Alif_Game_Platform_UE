@@ -14,7 +14,8 @@
 
 #include "DrawDebugHelpers.h"
 
-AMainPlayerController::AMainPlayerController():
+AMainPlayerController::AMainPlayerController(const FObjectInitializer& ObjectInitializer):
+    Super(ObjectInitializer),
     PickableSphereTraceRadius(50.f),
     PickableSphereTraceZOffset(0.f,0.f,200.f)
 {

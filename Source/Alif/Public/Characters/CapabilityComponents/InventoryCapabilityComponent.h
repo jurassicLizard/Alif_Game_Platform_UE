@@ -33,7 +33,6 @@ public:
 
 private:
 
-	uint8 MaxWeapons = 2;
 	UPROPERTY()
 	TArray<ABaseWeapon*> WeaponsInventoryArray;
 	UPROPERTY()
@@ -71,13 +70,15 @@ public:
 	UFUNCTION()
 	int32 GetWeaponInventorySize() const{return WeaponsInventoryArray.Num();}
 	UFUNCTION()
-	int32 GetMaxWeaponInventorySize() const {return MaxWeapons;}
+	uint8 GetMaxWeaponInventorySize() const;
 	UFUNCTION()
-	bool HasRemainingInventoryCapacity() const {return (WeaponsInventoryArray.Num() < MaxWeapons);}
+	bool HasRemainingInventoryCapacity() const;
 	UFUNCTION()
 	ABaseWeapon* GetLastWeapon() const{return ((WeaponsInventoryArray.Num() > 0) ? WeaponsInventoryArray.Top() : nullptr);}
 	UFUNCTION()
 	bool HasWeaponOfSameTypeInInventory(ABaseWeapon* WeaponToCheck) const;
+	UFUNCTION()
+	bool SwitchToNextWeapon();
 
 
 	
