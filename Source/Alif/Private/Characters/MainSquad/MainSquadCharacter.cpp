@@ -212,7 +212,7 @@ bool AMainSquadCharacter::CanQueryMoveState()
 }
 
 
-void AMainSquadCharacter::OnPickUpItem(const ABaseItem* ItemToPickUp)
+void AMainSquadCharacter::OnPickUpItem(const ABaseItem* ItemToPickUp) //FIXME rename this to OnEquipItem
 {
 	//WARNING this interface implementation is called by the pickup capability component and should not be called explicitly to avoid recursions
 
@@ -281,9 +281,19 @@ void AMainSquadCharacter::OnStowItem(const ABaseItem* ItemToStow)
 	}
 }
 
-void AMainSquadCharacter::SwitchToNextWeapon()
+bool AMainSquadCharacter::TriggerWeaponSwitch()
 {
-	//do something
 	UE_LOG(LogAlifDebug,Warning,TEXT("Attempting to switch weapon for %s"),*GetName());
+
+	if(HasInventoryCapability())
+	{
+		return InventoryCapabilityComp->SwitchToNextWeapon();
+	}
+	else
+	{
+		UE_LOG(LogAlifDebug,Error,TEXT("Attempting to switch weapon on a character with no inventory capability this is fatal : %s"),*GetName())
+	}
+
+	return false;
 }
 //End Interface Implementation

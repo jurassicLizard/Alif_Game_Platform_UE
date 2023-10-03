@@ -1,8 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-//FIXME change this entire class to something more efficient this is a crappy class . instead of juggling around pointers in arrays . just have an array and juggle around indices
-//FIXME an idea is to use MAP<weapon,idx> where we just change the idx of a wapon based on where it is now
-//FIXME check if this is actually better first before making any changes here. dont fix what is not broken
 
 #include "Characters/CapabilityComponents/InventoryCapabilityComponent.h"
 #include "Items/Weapons/BaseWeapon.h"
@@ -240,15 +237,44 @@ bool UInventoryCapabilityComponent::HasWeaponOfSameTypeInInventory(ABaseWeapon* 
 
 }
 
+ABaseWeapon* UInventoryCapabilityComponent::CycleWeaponsInInventory()
+{
+	
+
+	if(GetWeaponInventorySize() > 1)
+	{
+		if(IPickupCapabilityInterface* OwnerIface = Cast<IPickupCapabilityInterface>(GetOwner()))
+		{
+			ABaseWeapon* FirstWeapon = GetMainWeapon();
+			
+			GetActiveWeaponInventory().RemoveSingle(FirstWeapon);
+			GetActiveWeaponInventory().Push(FirstWeapon);
+
+			//Call relevant pickup and stow interfaces on actor in order to setup the build of meshes
+
+			OwnerIface->OnStowItem(FirstWeapon);
+			OwnerIface->OnPickUpItem(GetMainWeapon());
+
+			return GetMainWeapon();
+			
+		}
+
+
+	}
+
+	return nullptr;
+}
 
 bool UInventoryCapabilityComponent::SwitchToNextWeapon()
 {
-	if(GetWeaponInventorySize()> 1)
+	if(CycleWeaponsInInventory())
 	{
 		// conduct switch of weapon and call interface function of switch which would be implemented by the actor
+		
 		if(IInventoryCapabilityInterface* OwningActorIface = Cast<IInventoryCapabilityInterface>(GetOwner()))
 		{
-			OwningActorIface->SwitchToNextWeapon();
+			OwningActorIface->OnSwitchToNextWeapon();
+			return true;
 			
 		}
 		else

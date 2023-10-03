@@ -193,15 +193,33 @@ void AMainSpectatorPawn::OnSwitchWeapon()
             if(SelectedActor->GetClass()->ImplementsInterface(UInventoryCapabilityInterface::StaticClass()))
             {
                 UE_LOG(LogAlifDebug,Display,TEXT("Attempting to Switch Weapon for %s"),*SelectedActor->GetName());
-                IInventoryCapabilityInterface* SelectedActorInvIface = Cast<IInventoryCapabilityInterface>(SelectedActor);
-                SelectedActorInvIface->SwitchToNextWeapon(); //FIXME this is wrong we should call InitiateSwitchToNextWeapon and rename SwitchToNextWeapon to OnSwitchToNextWeapon
+                if(IInventoryCapabilityInterface* SelectedActorInvIface = Cast<IInventoryCapabilityInterface>(SelectedActor))
+                {
+                    if(SelectedActorInvIface->TriggerWeaponSwitch())
+                    {
+                        UE_LOG(LogAlifDebug,Display,TEXT("Successfully triggered weapon switch for %s"),*SelectedActor->GetName());
+                    }
+                    else
+                    {
+                        UE_LOG(LogAlifDebug,Warning,TEXT("Failed to conduct weapon switch for %s, this maybe harmless like having only one item in inventory"),*SelectedActor->GetName());
+                    }
+                }
+                else
+                {
+                    UE_LOG(LogAlifDebug,Error,TEXT("Selected Actor %s doesnot implment the Inventory Capability even though it has an inventory capability component"),*SelectedActor->GetName())
+                }
                 
+            }
+            else
+            {
+                UE_LOG(LogAlifDebug,Error,TEXT("Selected Actor %s has no inventory capability component"),*SelectedActor->GetName())
+
             }
             //call switch on actor inventory
             
         }
     }
-}
+ }
 
 
 UMainCameraComponent *AMainSpectatorPawn::GetMainCameraComponent()

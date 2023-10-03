@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/CapabilityComponents/InventoryCapabilityComponent.h"
 #include "UObject/Interface.h"
 #include "InventoryCapabilityInterface.generated.h"
 
@@ -21,7 +22,10 @@ class ALIF_API IInventoryCapabilityInterface
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
+
 public:
-	virtual void SwitchToNextWeapon() = 0;
 	virtual uint8 GetMaxWeapons() = 0;
+	virtual bool TriggerWeaponSwitch() = 0;
+
+	friend UInventoryCapabilityComponent;
 };

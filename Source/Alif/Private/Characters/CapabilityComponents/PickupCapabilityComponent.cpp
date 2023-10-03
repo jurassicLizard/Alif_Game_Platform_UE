@@ -71,7 +71,7 @@ void UPickupCapabilityComponent::TickComponent(float DeltaTime, ELevelTick TickT
 							{
 								UE_LOG(LogAlifDebug, Warning, TEXT("%s : %s  has stopped with PENDING Pickup State . attempting to pick up %s"),*GetReadableName(),*GetOwner()->GetName(),*PendingItemToPickUp->GetName());
 								// OwnerIface->PickUpItem(PendingItemToPickUp); //WARNING dont call pickupitem here it is called by the pickup interface. this can lead to recursions and or unintended consequences
-								if(ABaseCharacter* OwnerChar = Cast<ABaseCharacter>(GetOwner()))
+								if(ABaseCharacter* OwnerChar = Cast<ABaseCharacter>(GetOwner())) //FIXME this should be changed from BaseCharacter to Interface FUnction
 								{
 									//we already checked for inventory null pointer when we did validity checks
 									if(ABaseWeapon* WeaponToPickup = Cast<ABaseWeapon>(PendingItemToPickUp))

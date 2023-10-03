@@ -48,11 +48,20 @@ private:
 	bool RemoveWeaponFromInvAndDestroy(ABaseWeapon* DeletedBaseWeapon);
 	UFUNCTION()
 	bool AddWeaponToInventoryAtIdx(ABaseWeapon const* NewBaseWeapon,int32 Idx); //This add is unique // we need to keep this private since this add is unchecked so we use it internally only
-	
+	/**
+	 * @brief cycle weapons in inventory making the second weapon as main weapon and main weapon as last
+	 *
+	 * this also shifts all weapons accordingly in the array and returns a pointer to the new main weapon
+	 * @return ABaseWeapon* as new main weapon
+	 */
+	UFUNCTION()
+	ABaseWeapon* CycleWeaponsInInventory();
+	UFUNCTION()
 	bool IsMainWeaponIdx(int32 Idx) const {return (Idx == 0);}
-
 	UFUNCTION()
 	void ResetAllPendingItemActions();
+	UFUNCTION()
+	FORCEINLINE TArray<ABaseWeapon*>& GetActiveWeaponInventory() { return WeaponsInventoryArray; }
 
 
 public:

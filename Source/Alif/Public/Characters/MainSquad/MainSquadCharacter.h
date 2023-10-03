@@ -58,7 +58,7 @@ protected:
 	UFUNCTION()
 	virtual void OnStowItem(const ABaseItem* ItemToStow) override;
 	UFUNCTION()
-	virtual void SwitchToNextWeapon() override;
+	virtual bool TriggerWeaponSwitch() override;
 	//FIXME add initiate Pickup item , initiate stow item maybe ??
 
 public:
