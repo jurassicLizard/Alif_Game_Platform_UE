@@ -273,7 +273,7 @@ bool UInventoryCapabilityComponent::SwitchToNextWeapon()
 		
 		if(IInventoryCapabilityInterface* OwningActorIface = Cast<IInventoryCapabilityInterface>(GetOwner()))
 		{
-			OwningActorIface->OnSwitchToNextWeapon();
+			OwningActorIface->TriggerWeaponSwitch();
 			return true;
 			
 		}
