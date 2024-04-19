@@ -1,11 +1,14 @@
-# Alif
+# Alif Demonstrator Game
+
+> :information_source: Project tested with Unreal Engine 5.1.1 and 5.2.1
+
 
 This is a Demonstrator game intended to create a platform for developing top-down squad-based games similar to Commandos with Unreal Engine 5
 For learning purposes everything in this demonstrator was written in C++ including UE5s EnhancedInput for responding to key presses. Therefore it can also be used as a simple How-To to showcase how to do things in pure C++ instead of relying on a Hybrid C++/Blueprint Setup.
 
 [External Link for Video Demonstration](https://drive.proton.me/urls/QB8AYQNMPR#IPO76euccHJx)
 
-# Most Important Actor Classes
+# Actor Classes
 
 ## Characters
 * **ABaseCharacter** : 
@@ -25,7 +28,7 @@ For learning purposes everything in this demonstrator was written in C++ includi
 * **APrototypeRifle** :  extends ABaseWeapon and is meant to be visible in the world by initializing a relevant texture mesh
 
 
-# Most Important Component Classes that can be attached to actors
+# Component Classes that can be attached to actors
 
 ## Characters
 
