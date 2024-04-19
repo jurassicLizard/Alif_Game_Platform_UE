@@ -8,17 +8,17 @@ For learning purposes everything in this demonstrator was written in C++ includi
 
 ## Characters
 * **ABaseCharacter** : 
- * Contains the base skeleton functionality and configuration for all characters to be placed in the game, any Character in this game will extend this class
+   * Contains the base skeleton functionality and configuration for all characters to be placed in the game, any Character in this game will extend this class
 * **AMainSquadCharacter** : any Class extending this will inherit all movement functionality. as well as collision capsules. meshes can be adjusted in child accordingly i.e. :
- * Character is selectable with LMB
- * Character is moveable around the world with LMB
- * RMB deselects everything
- * Character has collisions set up and is placeable in world (no meshes yet)
+   * Character is selectable with LMB
+   * Character is moveable around the world with LMB
+   * RMB deselects everything
+   * Character has collisions set up and is placeable in world (no meshes yet)
 * **TestCharacter** : an example of how to extend AMainSquadCharacter and set it up with Animation and Meshes for a more realistic character. Blueprints can also be used from within the Unreal Editor to extend AMainSquadCharacter for a more UI-Friendly Approach . In this project however the focus was on doing almost everything possible in C++ for learning purposes even if it is not the most efficient way of doing things.
 
 ## Items
 * **ABaseItem** : any class extending this will inherit base item functionality
- * An ABaseItem can be pickable or non pickable
+    * An ABaseItem can be pickable or non pickable
 * **ABaseWeapon** : extends ABaseItem and is meant to supplement it with weapon specific logic (i.e. this can't be a Medkit but something that is a weapon)
 * **APrototypeCannon** : extends ABaseWeapon and is meant to be visible in the world by initializing a relevant texture mesh
 * **APrototypeRifle** :  extends ABaseWeapon and is meant to be visible in the world by initializing a relevant texture mesh
@@ -61,4 +61,4 @@ For learning purposes everything in this demonstrator was written in C++ includi
 The logic in this project can be used with any meshes or assets thanks to OOP and Unreal Engine. The Meshes used in this project are only for demonstrative purposes and can be easily replaced with something else
 
 * [Paragon Wraith Epic Games Free Content](https://www.unrealengine.com/marketplace/en-US/product/paragon-wraith)
-* [SimpleShootefr Asset for weapon meshes - Unknown Author](https://www.udemy.com/course/unrealcourse)
+* [SimpleShooter Asset for weapon meshes - Unknown Author](https://www.udemy.com/course/unrealcourse)
