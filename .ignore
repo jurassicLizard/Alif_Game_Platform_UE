@@ -1,6 +1,7 @@
-/Intermediate
-/.git
-/.vscode
-/.idea
-/Saved
-/Content
+Intermediate
+.git
+.vscode
+.idea
+Saved
+DerivedDataCache
+Content
