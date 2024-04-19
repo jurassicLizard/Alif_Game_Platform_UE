@@ -56,3 +56,9 @@ For learning purposes everything in this demonstrator was written in C++ includi
  * some simple Inverse Kinematics (for example : prone) are available and have been adapted for the ParagonWraith Character from Mixamo
 
 
+# External Assets used 
+
+The logic in this project can be used with any meshes or assets thanks to OOP and Unreal Engine. The Meshes used in this project are only for demonstrative purposes and can be easily replaced with something else
+
+* [Paragon Wraith Epic Games Free Content](https://www.unrealengine.com/marketplace/en-US/product/paragon-wraith)
+* [SimpleShootefr Asset for weapon meshes - Unknown Author](https://www.udemy.com/course/unrealcourse)
