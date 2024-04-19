@@ -66,3 +66,4 @@ The logic in this project can be used with any meshes or assets thanks to OOP an
 
 * [Paragon Wraith Epic Games Free Content](https://www.unrealengine.com/marketplace/en-US/product/paragon-wraith)
 * [SimpleShooter Asset for weapon meshes - Unknown Author](https://www.udemy.com/course/unrealcourse)
+* [Mixamo for IK Animations](https://www.mixamo.com)
