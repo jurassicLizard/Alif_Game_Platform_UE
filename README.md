@@ -3,6 +3,7 @@
 This is a Demonstrator game intended to create a platform for developing top-down squad-based games similar to Commandos with Unreal Engine 5
 For learning purposes everything in this demonstrator was written in C++ including UE5s EnhancedInput for responding to key presses. Therefore it can also be used as a simple How-To to showcase how to do things in pure C++ instead of relying on a Hybrid C++/Blueprint Setup.
 
+[External Link for Video Demonstration](https://drive.proton.me/urls/QB8AYQNMPR#IPO76euccHJx)
 
 # Most Important Actor Classes
 
